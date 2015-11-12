@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="CustomImageView">
+
+        <!-- 圆角度数 -->
+        <attr name="radius" format="dimension" />
+
+        <!-- 边框相关 -->
+        <attr name="hasBorder" format="boolean" />
+        <attr name="borderWidth" format="dimension" />
+        <attr name="borderColor" format="color|reference" />
+        <attr name="borderSurroundContent" format="boolean" />
+
+        <!-- 图片绘制器的type -->
+        <attr name="drawerType" format="string" />
+    </declare-styleable>
+
+</resources>
