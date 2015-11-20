@@ -473,28 +473,36 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     @Override
     public void onStartTemporaryDetach() {
         super.onStartTemporaryDetach();
-        mActivity.imageViews.remove(this);
+        if(mActivity!=null){
+            mActivity.imageViews.remove(this);
+        }
         stopLoad();
     }
 
     @Override
     public void onFinishTemporaryDetach() {
         super.onFinishTemporaryDetach();
-        mActivity.imageViews.add(this);
+        if(mActivity!=null){
+            mActivity.imageViews.add(this);
+        }
         startLoad();
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        mActivity.imageViews.add(this);
+        if(mActivity!=null){
+            mActivity.imageViews.add(this);
+        }
         startLoad();
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        mActivity.imageViews.remove(this);
+        if(mActivity!=null){
+            mActivity.imageViews.remove(this);
+        }
         stopLoad();
     }
 
