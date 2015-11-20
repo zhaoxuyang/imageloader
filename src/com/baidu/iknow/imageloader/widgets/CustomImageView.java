@@ -520,7 +520,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
      * @param dip
      * @return
      */
-    private int dipToPixel(Context context, int dip) {
+    public static int dipToPixel(Context context, int dip) {
         float density = context.getResources().getDisplayMetrics().density;
         int res = (int) (dip * density);
         return res;
@@ -576,9 +576,8 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         }
     }
 
-    public void setDrawerArgs(DrawerArgs args){
-        this.mArgs = args;
-        invalidate();
+    public DrawerArgs getDrawerArgs(){
+        return mArgs;
     }
 
 }

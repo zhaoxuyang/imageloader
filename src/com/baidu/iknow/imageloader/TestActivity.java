@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.baidu.iknow.imageloader.drawable.CustomDrawable;
+import com.baidu.iknow.imageloader.drawer.DrawerArgs;
 import com.baidu.iknow.imageloader.drawer.DrawerFactory;
 import com.baidu.iknow.imageloader.widgets.CustomActivity;
 import com.baidu.iknow.imageloader.widgets.CustomImageView;
 
 import android.graphics.Bitmap;
+import android.graphics.Path;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -162,6 +164,9 @@ public class TestActivity extends CustomActivity {
             case R.id.circleDrawer:
                 drawerType = DrawerFactory.CIRCLE;
                 break;
+            case R.id.customDrawer:
+                drawerType = DrawerFactory.CUSTOM;
+                break;
                 
         }
         adapter.notifyDataSetChanged();
@@ -209,13 +214,12 @@ public class TestActivity extends CustomActivity {
             }
 
             CustomImageView civ = (CustomImageView) convertView.findViewById(R.id.iv);
-            
+            ViewGroup.LayoutParams params = civ.getLayoutParams();
+
             if(position%2==0){
-                ViewGroup.LayoutParams params = civ.getLayoutParams();
                 params.width = (int) (60 * density);
                 params.height = (int) (60 *density);
             }else{
-                ViewGroup.LayoutParams params = civ.getLayoutParams();
                 params.width = (int) (80 * density);
                 params.height = (int) (80 *density);
             }
@@ -224,8 +228,23 @@ public class TestActivity extends CustomActivity {
                     civ.setImageResource(R.drawable.b);
                     break;
                 case 1:
+                    DrawerArgs da = civ.getDrawerArgs();
+                    da.mHasBorder = true;
+                    da.mBorderWidth = CustomImageView.dipToPixel(TestActivity.this, 1);
+                    da.mRadius = CustomImageView.dipToPixel(TestActivity.this, 4);
+                    da.mBorderColor = 0x0C000000;
+                    if(drawerType==DrawerFactory.CUSTOM){
+                        da.mPath = new Path();
+                        da.mPath.moveTo(params.width/2, 0);
+                        da.mPath.lineTo(0, params.height/2);
+                        da.mPath.lineTo(params.width/2, params.height);
+                        da.mPath.lineTo(params.width, params.height/2);
+                        da.mPath.lineTo(params.width/2, 0);
+                        da.mPath.close();
+                        da.mBorderPath = new Path(da.mPath);
+                    }
                     civ.blankImage(R.drawable.s, scaleType, drawerType).errorImage(R.drawable.error, scaleType, drawerType).scaleType(scaleType)
-                            .drawerType(drawerType).url(data.key);
+                    .drawerType(drawerType).url(data.key);
                     break;
             }
 
