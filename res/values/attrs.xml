@@ -12,8 +12,20 @@
         <attr name="borderColor" format="color|reference" />
         <attr name="borderSurroundContent" format="boolean" />
 
+        <!-- 夜间模式相关 -->
+        <attr name="isNight" format="boolean" />
+
+
+        <!-- alpha相关 -->
+        <attr name="alpha" format="float" />
+
         <!-- 图片绘制器的type -->
-        <attr name="drawerType" format="string" />
+        <attr name="drawerType" format="enum" >
+            <enum name="normal" value="0"/>
+            <enum name="round_rect" value="1"/>
+            <enum name="circle" value="2"/>
+            <enum name="custom" value="3"/>
+        </attr>
     </declare-styleable>
 
 </resources>

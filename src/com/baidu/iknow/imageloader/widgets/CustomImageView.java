@@ -96,6 +96,8 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     private DrawablePlayer mPlayer;
 
+    private CustomActivity mActivity;
+
     public CustomImageView(Context context) {
         super(context);
         init(null);
@@ -127,14 +129,15 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
                     dipToPixel(getContext(), DEFAULT_BORDER_WIDTH));
             mArgs.mBorderColor = a.getColor(R.styleable.CustomImageView_borderColor, DEFAULT_BORDER_COLOR);
             mArgs.mBorderSurroundContent = a.getBoolean(R.styleable.CustomImageView_borderSurroundContent, true);
-
-            mDrawerType = a.getInt(R.styleable.CustomImageView_drawerType, 0);
-
+            mArgs.mIsNight = a.getBoolean(R.styleable.CustomImageView_isNight, false);
+            mArgs.mAlpha = a.getFloat(R.styleable.CustomImageView_alpha,1.0f);
+            mDrawerType = a.getInt(R.styleable.CustomImageView_drawerType, DrawerFactory.NORMAL);
             a.recycle();
         } else {
             mArgs.mRadius = dipToPixel(getContext(), DEFAULT_RADIUS);
             mArgs.mBorderWidth = dipToPixel(getContext(), DEFAULT_BORDER_WIDTH);
             mArgs.mBorderColor = DEFAULT_BORDER_COLOR;
+            mDrawerType = DrawerFactory.NORMAL;
         }
         if (mDrawableWrapper == null) {
             mDrawableWrapper = new DrawableWrapper();
@@ -144,6 +147,12 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         mDrawableWrapper.mPaddingTop = getPaddingTop();
         mDrawableWrapper.mPaddingBottom = getPaddingBottom();
         mDecodeInfo = new DecodeInfo.DecodeInfoBuilder().build();
+        Context context = getContext();
+        if(context instanceof  CustomActivity){
+            mActivity = (CustomActivity) context;
+            mActivity.imageViews.add(this);
+        }
+
     }
 
     @SuppressLint("NewApi")
@@ -401,11 +410,9 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     }
 
     private boolean isFastScroll() {
-        Context context = getContext();
         boolean isFastScroll = false;
-        if (context instanceof CustomActivity) {
-            CustomActivity ca = (CustomActivity) context;
-            isFastScroll = ca.isFastScroll;
+        if (mActivity!=null) {
+            isFastScroll = mActivity.isFastScroll;
         }
         return isFastScroll;
     }
@@ -466,24 +473,28 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     @Override
     public void onStartTemporaryDetach() {
         super.onStartTemporaryDetach();
+        mActivity.imageViews.remove(this);
         stopLoad();
     }
 
     @Override
     public void onFinishTemporaryDetach() {
         super.onFinishTemporaryDetach();
+        mActivity.imageViews.add(this);
         startLoad();
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        mActivity.imageViews.add(this);
         startLoad();
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        mActivity.imageViews.remove(this);
         stopLoad();
     }
 
@@ -563,6 +574,11 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         if (mNeedResize) {
             requestLayout();
         }
+    }
+
+    public void setDrawerArgs(DrawerArgs args){
+        this.mArgs = args;
+        invalidate();
     }
 
 }

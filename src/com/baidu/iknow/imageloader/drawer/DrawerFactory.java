@@ -7,9 +7,8 @@ import android.graphics.drawable.Drawable;
 
 /**
  * 绘制器工厂
- * 
+ *
  * @author zhaoxuyang
- * 
  */
 public class DrawerFactory {
 
@@ -18,6 +17,8 @@ public class DrawerFactory {
     public static final int ROUND_RECT = 1;
 
     public static final int CIRCLE = 2;
+
+    public static final int CUSTOM = 3;
 
     private static DrawerFactory mInstance;
 
@@ -35,17 +36,19 @@ public class DrawerFactory {
     }
 
     public AbsDrawer getDrawer(Drawable drawable, int type, AbsDrawer drawer) {
-        
+
         if (drawable == null) {
             return null;
         }
-        
+
         Class clazz = null;
         if (drawable instanceof CustomDrawable) {
             if (CIRCLE == type) {
                 clazz = CircleBitmapDrawer.class;
             } else if (ROUND_RECT == type) {
                 clazz = RoundRectBitmapDrawer.class;
+            } else if (CUSTOM == type) {
+                clazz = CustomBitmapDrawer.class;
             } else {
                 clazz = NormalBitmapDrawer.class;
             }

@@ -1,5 +1,7 @@
 package com.baidu.iknow.imageloader.widgets;
 
+import java.util.Iterator;
+
 import android.content.Context;
 import android.os.Handler;
 import android.util.AttributeSet;
@@ -23,27 +25,18 @@ public class CustomListView extends ListView {
 
         @Override
         public void run() {
-            int childCount = getChildCount();
-            for (int i = 0; i < childCount; i++) {
-                refreshView(getChildAt(i));
-            }
+           if(mActivity!=null){
+               Iterator<CustomImageView> iterator = mActivity.imageViews.iterator();
+               while(iterator.hasNext()){
+                   CustomImageView imageview = iterator.next();
+                   imageview.refresh();
+               }
+           }
         }
     };
 
-    private void refreshView(View v) {
-        if (v instanceof CustomImageView) {
-            CustomImageView imageview = (CustomImageView) v;
-            imageview.refresh();
-        } else if (v instanceof ViewGroup) {
-            ViewGroup vg = (ViewGroup) v;
-            int count = vg.getChildCount();
-            for (int i = 0; i < count; i++) {
-                View view = vg.getChildAt(i);
-                refreshView(view);
-            }
-        }
+    private CustomActivity mActivity;
 
-    }
 
     private OnScrollListener mProxyScrollListener = new OnScrollListener() {
 
@@ -53,14 +46,12 @@ public class CustomListView extends ListView {
             if (mOnScrollListener != null) {
                 mOnScrollListener.onScrollStateChanged(view, scrollState);
             }
-            Context context = view.getContext();
-            if (context instanceof CustomActivity) {
-                CustomActivity ca = (CustomActivity) context;
+            if (mActivity!=null) {
                 if (scrollState == OnScrollListener.SCROLL_STATE_FLING) {
                     removeCallbacks(mRefreshRunnable);
-                    ca.isFastScroll = true;
-                } else if (ca.isFastScroll) {
-                    ca.isFastScroll = false;
+                    mActivity.isFastScroll = true;
+                } else if (mActivity.isFastScroll) {
+                    mActivity.isFastScroll = false;
                     mHandler.removeCallbacks(mRefreshRunnable);
                     mHandler.postDelayed(mRefreshRunnable, 200);
                 }
@@ -91,6 +82,10 @@ public class CustomListView extends ListView {
 
     private void init() {
         setOnScrollListener(mProxyScrollListener);
+        Context context = getContext();
+        if(context instanceof CustomActivity){
+            mActivity = (CustomActivity) context;
+        }
     }
 
     @Override
