@@ -1,4 +1,5 @@
 package com.baidu.iknow.imageloader;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,9 +32,8 @@ public class TestActivity extends CustomActivity {
     private MyAdapter adapter = new MyAdapter();
 
     public static HashMap<String, CustomDrawable> drawables = new HashMap<String, CustomDrawable>();
-    
+
     private float density;
-    
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +42,7 @@ public class TestActivity extends CustomActivity {
         // try {
 
         setContentView(R.layout.activity_list_item);
+        addData("http://img.name2012.com/uploads/allimg/2015-06/30-023131_451.jpg");
         addData("http://www.baidu.com");
         addData("http://tb.himg.baidu.com/sys/portrait/item/6ebee68891e69c89e5a5bde5908de5ad9779799774");
         addData("http://imgsrc.baidu.com/forum/w%3D580/sign=97a22355e6fe9925cb0c695804a95ee4/f0160924ab18972b798c3b5ae0cd7b899f510aef.jpg");
@@ -73,7 +74,7 @@ public class TestActivity extends CustomActivity {
         mdatas.addAll(mdatas);
         mdatas.addAll(mdatas);
         mdatas.addAll(mdatas);
-        
+
         addData("http://img4.duitang.com/uploads/item/201502/15/20150215224242_Z5mBC.thumb.224_0.jpeg");
         addData("http://www.ittribalwo.com/upfiles/image/20140506181328.gif");
         addData("http://g.hiphotos.baidu.com/image/pic/item/0df3d7ca7bcb0a46b48645306963f6246b60af17.jpg");
@@ -95,10 +96,9 @@ public class TestActivity extends CustomActivity {
         mdatas.addAll(mdatas);
         mdatas.addAll(mdatas);
 
-        
         listView = (ListView) findViewById(R.id.list);
         listView.setAdapter(adapter);
-        
+
         density = getResources().getDisplayMetrics().density;
 
     }
@@ -109,9 +109,7 @@ public class TestActivity extends CustomActivity {
         data.type = 1;
         mdatas.add(data);
     }
-    
 
-    
     private void checkBuffer(Bitmap bm) {
         Class clazz = Bitmap.class;
         try {
@@ -167,7 +165,7 @@ public class TestActivity extends CustomActivity {
             case R.id.customDrawer:
                 drawerType = DrawerFactory.CUSTOM;
                 break;
-                
+
         }
         adapter.notifyDataSetChanged();
     }
@@ -216,12 +214,12 @@ public class TestActivity extends CustomActivity {
             CustomImageView civ = (CustomImageView) convertView.findViewById(R.id.iv);
             ViewGroup.LayoutParams params = civ.getLayoutParams();
 
-            if(position%2==0){
+            if (position % 2 == 0) {
                 params.width = (int) (60 * density);
-                params.height = (int) (60 *density);
-            }else{
-                params.width = (int) (80 * density);
-                params.height = (int) (80 *density);
+                params.height = (int) (60 * density);
+            } else {
+                params.width = (int) (100 * density);
+                params.height = (int) (100 *density);
             }
             switch (type) {
                 case 0:
@@ -233,18 +231,19 @@ public class TestActivity extends CustomActivity {
                     da.mBorderWidth = CustomImageView.dipToPixel(TestActivity.this, 1);
                     da.mRadius = CustomImageView.dipToPixel(TestActivity.this, 4);
                     da.mBorderColor = 0x0C000000;
-                    if(drawerType==DrawerFactory.CUSTOM){
+                    if (drawerType == DrawerFactory.CUSTOM) {
                         da.mPath = new Path();
-                        da.mPath.moveTo(params.width/2, 0);
-                        da.mPath.lineTo(0, params.height/2);
-                        da.mPath.lineTo(params.width/2, params.height);
-                        da.mPath.lineTo(params.width, params.height/2);
-                        da.mPath.lineTo(params.width/2, 0);
+                        da.mPath.moveTo(params.width / 2, 0);
+                        da.mPath.lineTo(0, params.height / 2);
+                        da.mPath.lineTo(params.width / 2, params.height);
+                        da.mPath.lineTo(params.width, params.height / 2);
+                        da.mPath.lineTo(params.width / 2, 0);
                         da.mPath.close();
                         da.mBorderPath = new Path(da.mPath);
                     }
-                    civ.blankImage(R.drawable.s, scaleType, drawerType).errorImage(R.drawable.error, scaleType, drawerType).scaleType(scaleType)
-                    .drawerType(drawerType).url(data.key);
+                    civ.blankImage(R.drawable.s, scaleType, drawerType)
+                            .errorImage(R.drawable.error, scaleType, drawerType).scaleType(scaleType)
+                            .drawerType(drawerType).url(data.key);
                     break;
             }
 
