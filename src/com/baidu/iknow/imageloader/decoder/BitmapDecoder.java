@@ -54,7 +54,14 @@ public class BitmapDecoder extends BaseDecoder {
             opts.inMutable = true;
             opts.inBitmap = ImageLoader.getInstance().mBitmapPool.get(bitmapWidth, bitmapHeight, false, false);
         }
-        Bitmap bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, opts);
+        Bitmap bm = null;
+        try{
+            bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, opts);
+        }catch(Exception e){
+            Log.d(TAG, "bitmap decode error!");
+            e.printStackTrace();
+            return null;
+        }
         if (bm != null) {
             Log.d(TAG, "after bitmap width:" + bm.getWidth() + ",height:" + bm.getHeight());
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
