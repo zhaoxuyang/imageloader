@@ -22,6 +22,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -121,17 +122,17 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         if (attrs != null) {
             TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.CustomImageView);
 
-            mArgs.mRadius = a.getDimensionPixelSize(R.styleable.CustomImageView_radius,
+            mArgs.mRadius = a.getDimensionPixelSize(R.styleable.CustomImageView_civ_radius,
                     dipToPixel(getContext(), DEFAULT_RADIUS));
 
-            mArgs.mHasBorder = a.getBoolean(R.styleable.CustomImageView_hasBorder, true);
-            mArgs.mBorderWidth = a.getDimensionPixelSize(R.styleable.CustomImageView_borderWidth,
+            mArgs.mHasBorder = a.getBoolean(R.styleable.CustomImageView_civ_hasBorder, true);
+            mArgs.mBorderWidth = a.getDimensionPixelSize(R.styleable.CustomImageView_civ_borderWidth,
                     dipToPixel(getContext(), DEFAULT_BORDER_WIDTH));
-            mArgs.mBorderColor = a.getColor(R.styleable.CustomImageView_borderColor, DEFAULT_BORDER_COLOR);
-            mArgs.mBorderSurroundContent = a.getBoolean(R.styleable.CustomImageView_borderSurroundContent, true);
-            mArgs.mIsNight = a.getBoolean(R.styleable.CustomImageView_isNight, false);
-            mArgs.mAlpha = a.getFloat(R.styleable.CustomImageView_alpha,1.0f);
-            mDrawerType = a.getInt(R.styleable.CustomImageView_drawerType, DrawerFactory.NORMAL);
+            mArgs.mBorderColor = a.getColor(R.styleable.CustomImageView_civ_borderColor, DEFAULT_BORDER_COLOR);
+            mArgs.mBorderSurroundContent = a.getBoolean(R.styleable.CustomImageView_civ_borderSurroundContent, true);
+            mArgs.mIsNight = a.getBoolean(R.styleable.CustomImageView_civ_isNight, false);
+            mArgs.mAlpha = a.getFloat(R.styleable.CustomImageView_civ_alpha,1.0f);
+            mDrawerType = a.getInt(R.styleable.CustomImageView_civ_drawerType, DrawerFactory.NORMAL);
             a.recycle();
         } else {
             mArgs.mRadius = dipToPixel(getContext(), DEFAULT_RADIUS);
@@ -370,7 +371,6 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         if (!mHasFrame || TextUtils.isEmpty(mUrl)) {
             return null;
         }
-
         CustomDrawable drawable = ImageLoader.getInstance().getMemmory(mUrl, mDrawableWrapper.mViewWidth,
                 mDrawableWrapper.mViewHeight);
         return drawable;
@@ -402,6 +402,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         } else if (mUrl.equals(url)) {
             return;
         }
+
         mNeedComputeBounds = true;
         stopLoad();
         mUrl = url;
@@ -434,6 +435,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             mPlayer.stop();
             mPlayer = null;
         }
+        clearAnimation();
     }
 
     public CustomImageView blankImage(int resid, ScaleType scaleType, int drawerType) {
@@ -447,7 +449,6 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         if (mBlankDrawable instanceof android.graphics.drawable.BitmapDrawable) {
             mBlankDrawable = BitmapDrawableFactory
                     .createBitmapDrawable(((android.graphics.drawable.BitmapDrawable) mBlankDrawable).getBitmap());
-            ;
         }
         mBlankDrawer = DrawerFactory.getInstance(getContext())
                 .getDrawer(mBlankDrawable, mBlankDrawerType, mBlankDrawer);
@@ -470,8 +471,15 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         return this;
     }
 
+    private boolean mIsAttach;
+
+
     @Override
     public void onStartTemporaryDetach() {
+        if(!mIsAttach){
+            return;
+        }
+        mIsAttach = false;
         super.onStartTemporaryDetach();
         if(mActivity!=null){
             mActivity.imageViews.remove(this);
@@ -481,6 +489,10 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     public void onFinishTemporaryDetach() {
+        if(mIsAttach){
+            return;
+        }
+        mIsAttach = true;
         super.onFinishTemporaryDetach();
         if(mActivity!=null){
             mActivity.imageViews.add(this);
@@ -490,6 +502,10 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     protected void onAttachedToWindow() {
+        if(mIsAttach){
+            return;
+        }
+        mIsAttach = true;
         super.onAttachedToWindow();
         if(mActivity!=null){
             mActivity.imageViews.add(this);
@@ -499,6 +515,10 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     protected void onDetachedFromWindow() {
+        if(!mIsAttach){
+            return;
+        }
+        mIsAttach = false;
         super.onDetachedFromWindow();
         if(mActivity!=null){
             mActivity.imageViews.remove(this);
@@ -510,8 +530,16 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
         if (!hasWindowFocus) {
+            if(!mIsAttach){
+                return;
+            }
+            mIsAttach = false;
             stopLoad();
         } else {
+            if(mIsAttach){
+                return;
+            }
+            mIsAttach = true;
             startLoad();
         }
     }
@@ -545,6 +573,9 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     public void onLoadingFailed(UrlSizeKey key, Exception failReason) {
+        if(!mIsAttach){
+            return;
+        }
         if (key.mUrl.equals(mUrl) && key.mViewWidth == mDrawableWrapper.mViewWidth
                 && key.mViewHeight == mDrawableWrapper.mViewHeight) {
             mNeedComputeBounds = true;
@@ -558,6 +589,9 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     public void onLoadingComplete(UrlSizeKey key, CustomDrawable drawable, boolean fromMemmoryCache) {
+        if(!mIsAttach){
+            return;
+        }
         if (key.mUrl.equals(mUrl) && key.mViewWidth == mDrawableWrapper.mViewWidth
                 && key.mViewHeight == mDrawableWrapper.mViewHeight) {
             mNeedComputeBounds = true;
@@ -579,6 +613,9 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     public void onLoadingCancelled(UrlSizeKey key) {
+        if(!mIsAttach){
+            return;
+        }
         if (mNeedResize) {
             requestLayout();
         }
