@@ -25,7 +25,7 @@ public interface ImageLoadingListener {
 
 	void onLoadingFailed(UrlSizeKey key, Exception failReason);
 
-	void onLoadingComplete(UrlSizeKey key, CustomDrawable drawable,boolean fromMemmoryCache);
+	void onLoadingComplete(UrlSizeKey key, CustomDrawable drawable, boolean fromMemmoryCache);
 
 	void onLoadingCancelled(UrlSizeKey key);
 }

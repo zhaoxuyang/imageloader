@@ -1,6 +1,7 @@
 package com.baidu.iknow.imageloader.drawer;
 
 
+import com.baidu.iknow.imageloader.cache.ImageLoaderLog;
 import com.baidu.iknow.imageloader.drawable.DrawableWrapper;
 
 import android.graphics.Canvas;
@@ -172,8 +173,8 @@ public abstract class AbsDrawer {
 		} else {
 			mBounds.set(0, 0, dwidth, dheight);
 			if (ScaleType.CENTER == drawable.mScaleType) {
-			    Log.d(TAG, "vw:"+vwidth+",dw:"+dwidth);
-			    Log.d(TAG, "vh:"+vheight+",dh:"+dheight);
+				ImageLoaderLog.d(TAG, "vw:"+vwidth+",dw:"+dwidth);
+				ImageLoaderLog.d(TAG, "vh:"+vheight+",dh:"+dheight);
 				mDrawMatrix.setTranslate((vwidth - dwidth) * 0.5f +0.5f,
 						(vheight - dheight) * 0.5f+0.5f);
 			} else if (ScaleType.CENTER_CROP == drawable.mScaleType) {
@@ -235,13 +236,12 @@ public abstract class AbsDrawer {
 				- pRight, scrollY + drawable.mViewHeight - pBottom);
 		canvas.translate(pLeft, pTop);
 
-		int save2 = canvas.save();
 		if (mArgs.mExtraMatrix != null) {
 			canvas.concat(mArgs.mExtraMatrix);
 		}
 
+		int save2 = canvas.save();
 		drawContentReal(canvas, drawable);
-
 		canvas.restoreToCount(save2);
 	
 		drawBorder(canvas, drawable);

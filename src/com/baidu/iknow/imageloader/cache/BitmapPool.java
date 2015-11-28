@@ -65,7 +65,7 @@ public class BitmapPool {
                 bitmap = iter.next();
                 size -= safeSizeOf(key, bitmap);
                 iter.remove();
-                Log.d(TAG, name + " reuse:" + "w:" + key.mWidth + ",h:" + key.mHeight);
+                ImageLoaderLog.d(TAG, name + " reuse:" + "w:" + key.mWidth + ",h:" + key.mHeight);
                 break;
             }
             if (mapValue.isEmpty()) {
@@ -83,7 +83,7 @@ public class BitmapPool {
                         bitmap = iterb.next();
                         iterb.remove();
                         size -= safeSizeOf(key, bitmap);
-                        Log.d(TAG, name + " reuse:ow:" + sk.mWidth + ",oh:" + sk.mHeight + ",w:" + key.mWidth + ",h:"
+                        ImageLoaderLog.d(TAG, name + " reuse:ow:" + sk.mWidth + ",oh:" + sk.mHeight + ",w:" + key.mWidth + ",h:"
                                 + key.mHeight);
                         break;
                     }
@@ -116,7 +116,7 @@ public class BitmapPool {
                 key.recycle();
                 return null;
             }
-            Log.d(TAG, name + " create:" + "w:" + key.mWidth + ",h:" + key.mHeight);
+            ImageLoaderLog.d(TAG, name + " create:" + "w:" + key.mWidth + ",h:" + key.mHeight);
             key.recycle();
             return createdValue;
         }
@@ -156,7 +156,7 @@ public class BitmapPool {
             mSortKeys.add(i, key);
         }
 
-        Log.d(TAG, name + " put");
+        ImageLoaderLog.d(TAG, name + " put");
         size += safeSize;
         list.add(value);
         trimToSize(maxSize);
@@ -164,7 +164,7 @@ public class BitmapPool {
     }
 
     private void trimToSize(int maxSize) {
-        Log.d(TAG, name+" size:" + size + ",maxsize:" + maxSize);
+        ImageLoaderLog.d(TAG, name+" size:" + size + ",maxsize:" + maxSize);
         Iterator<Map.Entry<SizeKey, LinkedList<Bitmap>>> iter = map.entrySet().iterator();
         while (iter.hasNext()) {
             SizeKey key;
@@ -175,7 +175,7 @@ public class BitmapPool {
                             + ".sizeOf() is reporting inconsistent results!");
                 }
 
-                Log.d(TAG, "size:" + size + ",maxsize:" + maxSize);
+                ImageLoaderLog.d(TAG, "size:" + size + ",maxsize:" + maxSize);
                 if (size <= maxSize || map.isEmpty()) {
                     break;
                 }
@@ -194,7 +194,7 @@ public class BitmapPool {
                     iterb.remove();
                     if (bm != null && !bm.isRecycled()) {
                         bm.recycle();
-                        Log.d(TAG, "recycle");
+                        ImageLoaderLog.d(TAG, "recycle");
                     }
                 }
 

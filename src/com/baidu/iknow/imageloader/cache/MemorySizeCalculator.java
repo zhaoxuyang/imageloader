@@ -58,7 +58,7 @@ public final class MemorySizeCalculator {
         }
 
         if (Log.isLoggable(TAG, Log.DEBUG)) {
-            Log.d(TAG, "Calculation complete" + ", Calculated memory cache size: " + toMb(memoryCacheSize)
+            ImageLoaderLog.d(TAG, "Calculation complete" + ", Calculated memory cache size: " + toMb(memoryCacheSize)
                     + ", pool size: " + toMb(bitmapPoolSize) + ", byte array size: " + toMb(arrayPoolSize)
                     + ", memory class limited? " + (targetMemoryCacheSize + targetPoolSize > maxSize) + ", max size: "
                     + toMb(maxSize) + ", memoryClass: " + activityManager.getMemoryClass() + ", isLowMemoryDevice: "
@@ -114,13 +114,13 @@ public final class MemorySizeCalculator {
 
     public static final class Builder {
         
-        static final int MEMORY_CACHE_TARGET_SCREENS = 1;
-        static final int BITMAP_POOL_TARGET_SCREENS = 2;
-        static final int GIF_BITMAP_POOL_TARGET_SCREENS = 1;
-        static final float MAX_SIZE_MULTIPLIER = 0.4f;
-        static final float LOW_MEMORY_MAX_SIZE_MULTIPLIER = 0.33f;
+        public static int MEMORY_CACHE_TARGET_SCREENS = 1;
+        public static int BITMAP_POOL_TARGET_SCREENS = 1;
+        public static int GIF_BITMAP_POOL_TARGET_SCREENS = 1;
+        public static float MAX_SIZE_MULTIPLIER = 0.4f;
+        public static float LOW_MEMORY_MAX_SIZE_MULTIPLIER = 0.33f;
         // 4MB.
-        static final int ARRAY_POOL_SIZE_BYTES = 4 * 1024 * 1024;
+        public static int ARRAY_POOL_SIZE_BYTES = 4 * 1024 * 1024;
 
         private final Context context;
 

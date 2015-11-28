@@ -9,6 +9,7 @@ import com.baidu.iknow.imageloader.drawer.DrawerArgs;
 import com.baidu.iknow.imageloader.drawer.DrawerFactory;
 import com.baidu.iknow.imageloader.widgets.CustomActivity;
 import com.baidu.iknow.imageloader.widgets.CustomImageView;
+import com.baidu.iknow.imageloader.widgets.CustomImageView.CustomImageBuilder;
 
 import android.graphics.Bitmap;
 import android.graphics.Path;
@@ -219,31 +220,29 @@ public class TestActivity extends CustomActivity {
                 params.height = (int) (60 * density);
             } else {
                 params.width = (int) (100 * density);
-                params.height = (int) (100 *density);
+                params.height = (int) (100 * density);
             }
             switch (type) {
                 case 0:
                     civ.setImageResource(R.drawable.b);
                     break;
                 case 1:
-                    DrawerArgs da = civ.getDrawerArgs();
-                    da.mHasBorder = true;
-                    da.mBorderWidth = CustomImageView.dipToPixel(TestActivity.this, 1);
-                    da.mRadius = CustomImageView.dipToPixel(TestActivity.this, 4);
-                    da.mBorderColor = 0x0C000000;
+                    CustomImageBuilder builder = civ.getBuilder();
                     if (drawerType == DrawerFactory.CUSTOM) {
-                        da.mPath = new Path();
-                        da.mPath.moveTo(params.width / 2, 0);
-                        da.mPath.lineTo(0, params.height / 2);
-                        da.mPath.lineTo(params.width / 2, params.height);
-                        da.mPath.lineTo(params.width, params.height / 2);
-                        da.mPath.lineTo(params.width / 2, 0);
-                        da.mPath.close();
-                        da.mBorderPath = new Path(da.mPath);
+                        Path path = new Path();
+                        path.moveTo(params.width / 2, 0);
+                        path.lineTo(0, params.height / 2);
+                        path.lineTo(params.width / 2, params.height);
+                        path.lineTo(params.width, params.height / 2);
+                        path.lineTo(params.width / 2, 0);
+                        path.close();
+                        builder.setCustomPath(path);
+                        Path borderPath = new Path(path);
+                        builder.setCustomBorderPath(borderPath);
                     }
-                    civ.blankImage(R.drawable.s, scaleType, drawerType)
-                            .errorImage(R.drawable.error, scaleType, drawerType).scaleType(scaleType)
-                            .drawerType(drawerType).url(data.key);
+                    builder.setBlankRes(R.drawable.s).setBlankScaleType(scaleType).setBlankDrawerType(drawerType)
+                            .setErrorRes(R.drawable.error).setErrorScaleType(scaleType).setErrorDrawerType(drawerType)
+                            .setDrawerType(drawerType).setScaleType(scaleType).build().url(data.key);
                     break;
             }
 

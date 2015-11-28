@@ -2,6 +2,7 @@ package com.baidu.iknow.imageloader.decoder;
 
 import android.util.Log;
 
+import com.baidu.iknow.imageloader.cache.ImageLoaderLog;
 import com.baidu.iknow.imageloader.drawable.CustomDrawable;
 import com.baidu.iknow.imageloader.drawable.GifDrawable.GifDrawableFactory;
 import com.baidu.iknow.imageloader.gif.Gif;
@@ -30,7 +31,7 @@ public class GifDecoder extends BaseDecoder{
         GifFactory.decodeFromByteArray(bytes, decodeInfo.mGifOptions);
         int bitmapWidth = decodeInfo.mGifOptions.outWidth;
         int bitmapHeight = decodeInfo.mGifOptions.outHeight;
-        Log.d(TAG, "gif width:" + bitmapWidth + ",height:" + bitmapHeight);
+        ImageLoaderLog.d(TAG, "gif width:" + bitmapWidth + ",height:" + bitmapHeight);
         int sampleSize = 1;
         if (decodeInfo.mScaleToFitView) {
             while (bitmapWidth / 2 >= viewWidth || bitmapHeight / 2 >= viewHeight) { // ||
@@ -43,7 +44,7 @@ public class GifDecoder extends BaseDecoder{
         decodeInfo.mGifOptions.inSampleSize = sampleSize;
         Gif gif = GifFactory.decodeFromByteArray(bytes, decodeInfo.mGifOptions);
         if(gif!=null){
-            Log.d(TAG, "after gif width:" + gif.mWidth + ",height:" + gif.mHeight);
+            ImageLoaderLog.d(TAG, "after gif width:" + gif.mWidth + ",height:" + gif.mHeight);
         }
         CustomDrawable drawable = GifDrawableFactory.createGifDrawable(gif);
         return drawable;

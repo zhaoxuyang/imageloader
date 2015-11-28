@@ -10,7 +10,7 @@ public class DrawerArgs {
 
     public float mRadius;
 
-    public boolean mHasBorder;
+    public boolean mHasBorder = true;
 
     public int mBorderWidth;
 

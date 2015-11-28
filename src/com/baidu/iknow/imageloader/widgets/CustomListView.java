@@ -42,7 +42,6 @@ public class CustomListView extends ListView {
 
         @Override
         public void onScrollStateChanged(AbsListView view, int scrollState) {
-            System.out.println("scrollState:" + scrollState);
             if (mOnScrollListener != null) {
                 mOnScrollListener.onScrollStateChanged(view, scrollState);
             }

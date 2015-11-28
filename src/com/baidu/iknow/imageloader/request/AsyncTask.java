@@ -232,7 +232,7 @@ public abstract class AsyncTask<Params, Progress, Result> {
      * <p>Runs on the UI thread after {@link #cancel(boolean)} is invoked and
      * {@link #doInBackground(Object[])} has finished.</p>
      * 
-     * <p>The default implementation simply invokes {@link #onCancelled()} and
+     * <p>The default implementation simply invokes {@link #onCancelled(result)} and
      * ignores the result. If you write your own implementation, do not call
      * <code>super.onCancelled(result)</code>.</p>
      *
@@ -244,23 +244,8 @@ public abstract class AsyncTask<Params, Progress, Result> {
      */
     @SuppressWarnings({"UnusedParameters"})
     protected void onCancelled(Result result) {
-        onCancelled();
-    }    
-    
-    /**
-     * <p>Applications should preferably override {@link #onCancelled(Object)}.
-     * This method is invoked by the default implementation of
-     * {@link #onCancelled(Object)}.</p>
-     * 
-     * <p>Runs on the UI thread after {@link #cancel(boolean)} is invoked and
-     * {@link #doInBackground(Object[])} has finished.</p>
-     *
-     * @see #onCancelled(Object) 
-     * @see #cancel(boolean)
-     * @see #isCancelled()
-     */
-    protected void onCancelled() {
     }
+    
 
     /**
      * Returns <tt>true</tt> if this task was cancelled before it completed
@@ -368,9 +353,9 @@ public abstract class AsyncTask<Params, Progress, Result> {
      * @return This instance of AsyncTask.
      *
      * @throws IllegalStateException If {@link #getStatus()} returns either
-     *         {@link AsyncTask.Status#RUNNING} or {@link AsyncTask.Status#FINISHED}.
+     *         {@link Status#RUNNING} or {@link Status#FINISHED}.
      *
-     * @see #executeOnExecutor(java.util.concurrent.Executor, Object[])
+     * @see #executeOnExecutor(Executor, Object[])
      * @see #execute(Runnable)
      */
     public final AsyncTask<Params, Progress, Result> execute(Params... params) {
@@ -406,7 +391,7 @@ public abstract class AsyncTask<Params, Progress, Result> {
      * @return This instance of AsyncTask.
      *
      * @throws IllegalStateException If {@link #getStatus()} returns either
-     *         {@link AsyncTask.Status#RUNNING} or {@link AsyncTask.Status#FINISHED}.
+     *         {@link Status#RUNNING} or {@link Status#FINISHED}.
      *
      * @see #execute(Object[])
      */
@@ -440,7 +425,7 @@ public abstract class AsyncTask<Params, Progress, Result> {
      * information on the order of execution.
      *
      * @see #execute(Object[])
-     * @see #executeOnExecutor(java.util.concurrent.Executor, Object[])
+     * @see #executeOnExecutor(Executor, Object[])
      */
     public static void execute(Runnable runnable) {
         sDefaultExecutor.execute(runnable);

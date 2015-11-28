@@ -8,6 +8,7 @@ import android.os.Build;
 import android.util.Log;
 
 import com.baidu.iknow.imageloader.bitmap.BitmapLock;
+import com.baidu.iknow.imageloader.cache.ImageLoaderLog;
 import com.baidu.iknow.imageloader.drawable.BitmapDrawable;
 import com.baidu.iknow.imageloader.drawable.CustomDrawable;
 import com.baidu.iknow.imageloader.drawable.BitmapDrawable.BitmapDrawableFactory;
@@ -36,7 +37,7 @@ public class BitmapDecoder extends BaseDecoder {
         BitmapFactory.decodeByteArray(bytes, 0, bytes.length, opts);
         int bitmapWidth = opts.outWidth;
         int bitmapHeight = opts.outHeight;
-        Log.d(TAG, "bitmap width:" + bitmapWidth + ",height:" + bitmapHeight);
+        ImageLoaderLog.d(TAG, "bitmap width:" + bitmapWidth + ",height:" + bitmapHeight);
         if (bitmapWidth <= 0 || bitmapHeight <= 0) {
             return null;
         }
@@ -54,16 +55,18 @@ public class BitmapDecoder extends BaseDecoder {
             opts.inMutable = true;
             opts.inBitmap = ImageLoader.getInstance().mBitmapPool.get(bitmapWidth, bitmapHeight, false, false);
         }
+
         Bitmap bm = null;
         try{
             bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, opts);
         }catch(Exception e){
-            Log.d(TAG, "bitmap decode error!");
+            ImageLoaderLog.d(TAG, "bitmap decode error");
             e.printStackTrace();
             return null;
         }
+
         if (bm != null) {
-            Log.d(TAG, "after bitmap width:" + bm.getWidth() + ",height:" + bm.getHeight());
+            ImageLoaderLog.d(TAG, "after bitmap width:" + bm.getWidth() + ",height:" + bm.getHeight());
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                 BitmapLock.lockBitmap(bm);
             }

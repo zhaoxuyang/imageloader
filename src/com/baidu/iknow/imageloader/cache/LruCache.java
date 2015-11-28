@@ -19,6 +19,8 @@ package com.baidu.iknow.imageloader.cache;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import android.util.Log;
+
 /**
  * Static library version of {@link android.util.LruCache}. Used to write apps
  * that run on API levels prior to 12. When running on API level 12 or above,
@@ -27,6 +29,9 @@ import java.util.Map;
  * overview.
  */
 public class LruCache<K, V> {
+
+    private static final String TAG = "MemmoryLruCache";
+
     private final LinkedHashMap<K, V> map;
 
     /** Size of this cache in units. Not necessarily the number of elements. */
@@ -142,6 +147,8 @@ public class LruCache<K, V> {
                 size -= safeSizeOf(key, previous);
             }
         }
+
+        ImageLoaderLog.d(TAG,"size:"+size+",maxSize:"+maxSize);
 
         if (previous != null) {
             entryRemoved(false, key, previous, value);

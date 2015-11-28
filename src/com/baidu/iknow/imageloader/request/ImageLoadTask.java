@@ -65,26 +65,31 @@ public class ImageLoadTask extends AsyncTask<UrlSizeKey, Integer, CustomDrawable
                 mImageLoadingListener.onLoadingComplete(mKey, result, false);
             } else {
                 mImageLoadingListener.onLoadingFailed(mKey, mException);
-                if (mKey != null) {
-                    mKey.recycle();
-                    mKey = null;
-                }
             }
+        }
+        if (mKey != null) {
+            mKey.recycle();
+            mKey = null;
         }
     }
 
     @Override
-    protected void onCancelled() {
-        super.onCancelled();
+    protected void onCancelled(CustomDrawable result) {
+        super.onCancelled(result);
         if (mHttpUrlFetcher != null) {
             mHttpUrlFetcher.cancel();
         }
         if (mImageLoadingListener != null) {
-            mImageLoadingListener.onLoadingCancelled(mKey);
-            if (mKey != null) {
-                mKey.recycle();
-                mKey = null;
+            if(result!=null){
+                mImageLoadingListener.onLoadingComplete(mKey,result,false);
+            }else{
+                mImageLoadingListener.onLoadingCancelled(mKey);
             }
+
+        }
+        if (mKey != null) {
+            mKey.recycle();
+            mKey = null;
         }
     }
 

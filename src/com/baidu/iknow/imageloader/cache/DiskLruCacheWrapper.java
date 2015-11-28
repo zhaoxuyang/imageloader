@@ -54,7 +54,7 @@ public class DiskLruCacheWrapper implements DiskCache {
     public DiskLruCache.Snapshot get(String key) {
         String safeKey = safeKeyGenerator.getSafeKey(key);
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
-            Log.v(TAG, "Get: Obtained: " + safeKey + " for for Key: " + key);
+            ImageLoaderLog.v(TAG, "Get: Obtained: " + safeKey + " for for Key: " + key);
         }
         DiskLruCache.Snapshot result = null;
         try {
@@ -64,7 +64,7 @@ public class DiskLruCacheWrapper implements DiskCache {
             }
         } catch (IOException e) {
             if (Log.isLoggable(TAG, Log.WARN)) {
-                Log.w(TAG, "Unable to get from disk cache", e);
+                ImageLoaderLog.w(TAG, "Unable to get from disk cache", e);
             }
         }
         return result;
@@ -76,7 +76,7 @@ public class DiskLruCacheWrapper implements DiskCache {
         try {
             String safeKey = safeKeyGenerator.getSafeKey(key);
             if (Log.isLoggable(TAG, Log.VERBOSE)) {
-                Log.v(TAG, "Put: Obtained: " + safeKey + " for for Key: " + key);
+                ImageLoaderLog.v(TAG, "Put: Obtained: " + safeKey + " for for Key: " + key);
             }
             try {
                 DiskLruCache diskCache = getDiskCache();
@@ -108,7 +108,7 @@ public class DiskLruCacheWrapper implements DiskCache {
                 }
             } catch (IOException e) {
                 if (Log.isLoggable(TAG, Log.WARN)) {
-                    Log.w(TAG, "Unable to put to disk cache", e);
+                    ImageLoaderLog.w(TAG, "Unable to put to disk cache", e);
                 }
             }
         } finally {
@@ -123,7 +123,7 @@ public class DiskLruCacheWrapper implements DiskCache {
             getDiskCache().remove(safeKey);
         } catch (IOException e) {
             if (Log.isLoggable(TAG, Log.WARN)) {
-                Log.w(TAG, "Unable to delete from disk cache", e);
+                ImageLoaderLog.w(TAG, "Unable to delete from disk cache", e);
             }
         }
     }
@@ -135,7 +135,7 @@ public class DiskLruCacheWrapper implements DiskCache {
             resetDiskCache();
         } catch (IOException e) {
             if (Log.isLoggable(TAG, Log.WARN)) {
-                Log.w(TAG, "Unable to clear disk cache", e);
+                ImageLoaderLog.w(TAG, "Unable to clear disk cache", e);
             }
         }
     }

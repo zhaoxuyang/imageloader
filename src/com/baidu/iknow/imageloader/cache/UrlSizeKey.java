@@ -22,15 +22,15 @@ public class UrlSizeKey {
             return false;
         }
         UrlSizeKey key = (UrlSizeKey) o;
-        boolean same;
+        boolean same = false;
         if (mUrl == null) {
             same = (mUrl == key.mUrl);
         } else {
             same = mUrl.equals(key.mUrl);
         }
 
-        same &= mViewWidth == key.mViewWidth;
-        same &= mViewHeight == key.mViewHeight;
+        same = same && (mViewWidth == key.mViewWidth);
+        same = same && (mViewHeight == key.mViewHeight);
         return same;
     }
 
@@ -47,6 +47,17 @@ public class UrlSizeKey {
     public static UrlSizeKey obtain() {
         UrlSizeKey instance = sPool.acquire();
         instance = (instance != null) ? instance : new UrlSizeKey();
+        return instance;
+    }
+
+    public static UrlSizeKey obtain(UrlSizeKey key) {
+        UrlSizeKey instance = sPool.acquire();
+        instance = (instance != null) ? instance : new UrlSizeKey();
+        if(key!=null){
+            instance.mUrl = key.mUrl;
+            instance.mViewHeight = key.mViewHeight;
+            instance.mViewWidth = key.mViewWidth;
+        }
         return instance;
     }
 

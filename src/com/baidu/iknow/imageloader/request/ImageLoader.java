@@ -10,6 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import com.baidu.iknow.imageloader.cache.BitmapPool;
 import com.baidu.iknow.imageloader.cache.DiskCache;
 import com.baidu.iknow.imageloader.cache.ExternalCacheDiskCacheFactory;
+import com.baidu.iknow.imageloader.cache.ImageLoaderLog;
 import com.baidu.iknow.imageloader.cache.InternalCacheDiskCacheFactory;
 import com.baidu.iknow.imageloader.cache.MemmoryLruCache;
 import com.baidu.iknow.imageloader.cache.MemorySizeCalculator;
@@ -83,7 +84,7 @@ public class ImageLoader {
                     listener.onLoadingFailed(key, failReason);
                 }
                 mListeners.remove(key);
-                Log.d(TAG, "failed URL:" + key.mUrl + ",width:" + key.mViewWidth + ",height:" + key.mViewHeight);
+                ImageLoaderLog.d(TAG, "failed URL:" + key.mUrl + ",width:" + key.mViewWidth + ",height:" + key.mViewHeight);
             }
             mFailedQuene.offer(key.mUrl);
             runNext();
@@ -91,7 +92,7 @@ public class ImageLoader {
 
         @Override
         public void onLoadingComplete(UrlSizeKey key, CustomDrawable drawable, boolean fromMemmoryCache) {
-            mMemmoryCache.put(key, drawable);
+            mMemmoryCache.put(UrlSizeKey.obtain(key), drawable);
             ImageLoadTask task = mTasks.remove(key);
             mRunningQuene.remove(task);
             HashSet<ImageLoadingListener> listenersSet = mListeners.get(key);
@@ -102,7 +103,7 @@ public class ImageLoader {
                     listener.onLoadingComplete(key, drawable, fromMemmoryCache);
                 }
                 mListeners.remove(key);
-                Log.d(TAG, "complete URL:" + key.mUrl + ",width:" + key.mViewWidth + ",height:" + key.mViewHeight);
+                ImageLoaderLog.d(TAG, "complete URL:" + key.mUrl + ",width:" + key.mViewWidth + ",height:" + key.mViewHeight);
             }
             runNext();
         }
@@ -163,6 +164,7 @@ public class ImageLoader {
     public void load(String url, int width, int height, DecodeInfo decodeInfo, ImageLoadingListener listener,
             boolean isFastScroll) {
 
+
         if (decodeInfo == null) {
             decodeInfo = new DecodeInfo.DecodeInfoBuilder().build();
         }
@@ -198,7 +200,7 @@ public class ImageLoader {
             return;
         }
 
-        Log.d(TAG, "startload URL:" + url + ",width:" + width + ",height:" + height);
+        ImageLoaderLog.d(TAG, "real startload URL:" + url + ",width:" + width + ",height:" + height);
 
         ImageLoadTask task = new ImageLoadTask();
         task.mImageLoadingListener = mDispatchListener;
@@ -227,7 +229,7 @@ public class ImageLoader {
         mFailedQuene.remove(url);
         UrlSizeKey key = obtain(url, width, height);
         if (mTasks.containsKey(key)) {
-            Log.d(TAG, "cancel waiting URL:" + url + ",width:" + width + ",height:" + height);
+            ImageLoaderLog.d(TAG, "cancel waiting URL:" + url + ",width:" + width + ",height:" + height);
             ImageLoadTask task = mTasks.get(key);
             if (mWaitingQuene.contains(task)) {
                 HashSet<ImageLoadingListener> listeners = mListeners.get(key);
@@ -238,16 +240,17 @@ public class ImageLoader {
                     mListeners.remove(key);
                 }
             } else {
-                Log.d(TAG, "cancel running URL:" + url + ",width:" + width + ",height:" + height);
+                ImageLoaderLog.d(TAG, "cancel running URL:" + url + ",width:" + width + ",height:" + height);
                 HashSet<ImageLoadingListener> listeners = mListeners.get(key);
                 listeners.remove(listener);
                 if (listeners.isEmpty()) {
                     boolean res = task.cancel(true);
-                    if (!res) {
+                    if(res){
                         mRunningQuene.remove(task);
                         mTasks.remove(key);
                         mListeners.remove(key);
                     }
+
                 }
             }
 

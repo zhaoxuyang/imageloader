@@ -22,8 +22,8 @@ public class MemmoryLruCache extends LruCache<UrlSizeKey, CustomDrawable> {
 
     @Override
     protected void entryRemoved(boolean evicted, UrlSizeKey key, CustomDrawable oldValue, CustomDrawable newValue) {
-        
-        Log.d(TAG, "recycle");
+
+        ImageLoaderLog.d(TAG, "recycle");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && oldValue instanceof BitmapDrawable) {
             BitmapDrawable bd = (BitmapDrawable) oldValue;
             ImageLoader.getInstance().mBitmapPool.put(bd.mBitmap);

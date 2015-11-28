@@ -22,7 +22,7 @@ public class GifFactory {
      * @param path
      * @return
      */
-    public static synchronized Gif decodeFromFile(String path, GifFactory.Options opts) {
+    public static synchronized Gif decodeFromFile(String path, Options opts) {
         File file = new File(path);
         if (!file.exists()) {
             Log.d("Giffactory", "file not exist");
@@ -37,7 +37,7 @@ public class GifFactory {
      * @param path
      * @return
      */
-    public static native Gif decodeFromFileNative(String path, GifFactory.Options opts);
+    public static native Gif decodeFromFileNative(String path, Options opts);
 
     /**
      * 通过bytearray解析
@@ -45,11 +45,11 @@ public class GifFactory {
      * @param bytes
      * @return
      */
-    public static synchronized Gif decodeFromByteArray(byte[] bytes, GifFactory.Options opts) {
+    public static synchronized Gif decodeFromByteArray(byte[] bytes, Options opts) {
         return decodeFromByteArrayNative(bytes, opts);
     }
 
-    private static native Gif decodeFromByteArrayNative(byte[] bytes, GifFactory.Options opts);
+    private static native Gif decodeFromByteArrayNative(byte[] bytes, Options opts);
 
     public static class Options {
         public boolean inJustDecodeBounds;

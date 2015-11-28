@@ -19,10 +19,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Path;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -31,7 +32,7 @@ import android.widget.ImageView;
 
 /**
  * 自定义imageview 与图片数据解耦
- * 
+ *
  * @author zhaoxuyang
  * @since 2015-9-17
  */
@@ -45,16 +46,11 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     private final int DEFAULT_BORDER_COLOR = 0x0C000000;
 
-    /**
-     * 绘制所需要的参数
-     */
-    protected DrawerArgs mArgs = new DrawerArgs();
-
     private AbsDrawer mDrawer;
 
-    private int mDrawerType;
+    private AbsDrawer mBlankDrawer;
 
-    private ScaleType mScaleType = ScaleType.FIT_XY;
+    private AbsDrawer mErrorDrawer;
 
     /**
      * 记录原始的measuremode，用来处理wrapcontent
@@ -63,33 +59,11 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     private int mHeightMeasureMode;
 
-    private int mBlankRes;
-
-    private Drawable mBlankDrawable;
-
-    private ScaleType mBlankScaleType = ScaleType.FIT_XY;
-
-    private int mBlankDrawerType;
-
-    private AbsDrawer mBlankDrawer;
-
-    private int mErrorRes;
-
-    private Drawable mErrorDrawable;
-
-    private ScaleType mErrorScaleType = ScaleType.FIT_XY;
-
-    private int mErrorDrawerType;
-
-    private AbsDrawer mErrorDrawer;
-
     private DrawableWrapper mDrawableWrapper;
 
     public boolean mNeedComputeBounds = true;
 
     private String mUrl;
-
-    private DecodeInfo mDecodeInfo;
 
     private boolean mHasFrame;
 
@@ -98,6 +72,8 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     private DrawablePlayer mPlayer;
 
     private CustomActivity mActivity;
+
+    private CustomImageBuilder mBuilder;
 
     public CustomImageView(Context context) {
         super(context);
@@ -115,44 +91,55 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     /**
      * 初始化，主要是读取属性，填充绘制参数。
-     * 
+     *
      * @param attrs
      */
     private void init(AttributeSet attrs) {
-        if (attrs != null) {
-            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.CustomImageView);
+        if(mPendingScaleType==null){
+            mPendingScaleType = ScaleType.FIT_XY;
+        }
+        mBuilder = new CustomImageBuilder(this);
+        mBuilder.setScaleType(mPendingScaleType);
+        try{
+            if (attrs != null) {
+                TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.CustomImageView);
 
-            mArgs.mRadius = a.getDimensionPixelSize(R.styleable.CustomImageView_civ_radius,
-                    dipToPixel(getContext(), DEFAULT_RADIUS));
+                mBuilder.mRadius = a.getDimensionPixelSize(R.styleable.CustomImageView_civ_radius,
+                        dipToPixel(getContext(), DEFAULT_RADIUS));
 
-            mArgs.mHasBorder = a.getBoolean(R.styleable.CustomImageView_civ_hasBorder, true);
-            mArgs.mBorderWidth = a.getDimensionPixelSize(R.styleable.CustomImageView_civ_borderWidth,
-                    dipToPixel(getContext(), DEFAULT_BORDER_WIDTH));
-            mArgs.mBorderColor = a.getColor(R.styleable.CustomImageView_civ_borderColor, DEFAULT_BORDER_COLOR);
-            mArgs.mBorderSurroundContent = a.getBoolean(R.styleable.CustomImageView_civ_borderSurroundContent, true);
-            mArgs.mIsNight = a.getBoolean(R.styleable.CustomImageView_civ_isNight, false);
-            mArgs.mAlpha = a.getFloat(R.styleable.CustomImageView_civ_alpha,1.0f);
-            mDrawerType = a.getInt(R.styleable.CustomImageView_civ_drawerType, DrawerFactory.NORMAL);
-            a.recycle();
-        } else {
-            mArgs.mRadius = dipToPixel(getContext(), DEFAULT_RADIUS);
-            mArgs.mBorderWidth = dipToPixel(getContext(), DEFAULT_BORDER_WIDTH);
-            mArgs.mBorderColor = DEFAULT_BORDER_COLOR;
-            mDrawerType = DrawerFactory.NORMAL;
+                mBuilder.mHasBorder = a.getBoolean(R.styleable.CustomImageView_civ_hasBorder, true);
+                mBuilder.mBorderWidth = a.getDimensionPixelSize(R.styleable.CustomImageView_civ_borderWidth,
+                        dipToPixel(getContext(), DEFAULT_BORDER_WIDTH));
+                mBuilder.mBorderColor = a.getColor(R.styleable.CustomImageView_civ_borderColor, DEFAULT_BORDER_COLOR);
+                mBuilder.mBorderSurroundContent = a.getBoolean(R.styleable.CustomImageView_civ_borderSurroundContent, true);
+                mBuilder.mIsNight = a.getBoolean(R.styleable.CustomImageView_civ_isNight, false);
+                mBuilder.mAlpha = a.getFloat(R.styleable.CustomImageView_civ_alpha, 1.0f);
+                mBuilder.mDrawerType = a.getInt(R.styleable.CustomImageView_civ_drawerType, DrawerFactory.NORMAL);
+                a.recycle();
+            } else {
+                mBuilder.mRadius = dipToPixel(getContext(), DEFAULT_RADIUS);
+                mBuilder.mBorderWidth = dipToPixel(getContext(), DEFAULT_BORDER_WIDTH);
+                mBuilder.mBorderColor = DEFAULT_BORDER_COLOR;
+                mBuilder.mDrawerType = DrawerFactory.NORMAL;
+            }
+            if (mDrawableWrapper == null) {
+                mDrawableWrapper = new DrawableWrapper();
+            }
+            mDrawableWrapper.mPaddingLeft = getPaddingLeft();
+            mDrawableWrapper.mPaddingRight = getPaddingRight();
+            mDrawableWrapper.mPaddingTop = getPaddingTop();
+            mDrawableWrapper.mPaddingBottom = getPaddingBottom();
+            Context context = getContext();
+            if (context instanceof CustomActivity) {
+                mActivity = (CustomActivity) context;
+                mActivity.imageViews.add(this);
+            }
+
+            mBuilder.mergeDrawArgs();
+        }catch(Exception e){
+            e.printStackTrace();
         }
-        if (mDrawableWrapper == null) {
-            mDrawableWrapper = new DrawableWrapper();
-        }
-        mDrawableWrapper.mPaddingLeft = getPaddingLeft();
-        mDrawableWrapper.mPaddingRight = getPaddingRight();
-        mDrawableWrapper.mPaddingTop = getPaddingTop();
-        mDrawableWrapper.mPaddingBottom = getPaddingBottom();
-        mDecodeInfo = new DecodeInfo.DecodeInfoBuilder().build();
-        Context context = getContext();
-        if(context instanceof  CustomActivity){
-            mActivity = (CustomActivity) context;
-            mActivity.imageViews.add(this);
-        }
+
 
     }
 
@@ -173,10 +160,12 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         } else {
             w = drawable.getIntrinsicWidth();
             h = drawable.getIntrinsicHeight();
-            if (w <= 0)
+            if (w <= 0) {
                 w = 1;
-            if (h <= 0)
+            }
+            if (h <= 0) {
                 h = 1;
+            }
 
         }
 
@@ -265,7 +254,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     /**
      * 绘制内容
-     * 
+     *
      * @param canvas
      */
     private void drawContent(Canvas canvas) {
@@ -273,7 +262,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         if (mDrawableWrapper.mDrawable == null || mDrawableWrapper.mDrawer == null) {
             return;
         }
-        mDrawableWrapper.mDrawer.updateArgs(mArgs);
+        mDrawableWrapper.mDrawer.updateArgs(mBuilder.mArgs);
         mDrawableWrapper.mNeedComputeBounds = mNeedComputeBounds;
         mDrawableWrapper.draw(canvas);
         mDrawableWrapper.mDrawable = null;
@@ -282,7 +271,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     /**
      * 绘制背景
-     * 
+     *
      * @param canvas
      */
     private void drawBackground(Canvas canvas) {
@@ -303,10 +292,16 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         }
     }
 
+    private ScaleType mPendingScaleType;
+
     @Override
     public void setScaleType(ScaleType scaleType) {
-        if (mScaleType != scaleType) {
-            mScaleType = scaleType;
+        if(mBuilder==null){
+            mPendingScaleType = scaleType;
+            return;
+        }
+        if (mBuilder.mScaleType != scaleType) {
+            mBuilder.mScaleType = scaleType;
             mNeedComputeBounds = true;
             invalidate();
         }
@@ -314,7 +309,10 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     public ScaleType getScaleType() {
-        return mScaleType;
+        if(mBuilder==null){
+            return super.getScaleType();
+        }
+        return mBuilder.mScaleType;
     }
 
     @Override
@@ -323,6 +321,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             BitmapDrawable bd = BitmapDrawableFactory
                     .createBitmapDrawable(((android.graphics.drawable.BitmapDrawable) drawable).getBitmap());
             drawable = bd;
+            mDrawer = DrawerFactory.getInstance(getContext()).getDrawer(drawable, mBuilder.mDrawerType, mDrawer);
         }
         mNeedComputeBounds = true;
         super.setImageDrawable(drawable);
@@ -335,14 +334,10 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         setImageDrawable(drawable);
     }
 
-    public void setDecodeInfo(DecodeInfo decodeInfo) {
-        this.mDecodeInfo = decodeInfo;
-    }
-
     @Override
     public Drawable getDrawable() {
-        Drawable drawable = super.getDrawable();
-        drawable = drawable != null ? drawable : getDrawableFromCache();
+        Drawable drawable = getDrawableFromCache();
+        drawable = drawable != null ? drawable : super.getDrawable();
         if (mPlayer == null) {
             mPlayer = DrawablePlayerFactory.getPlayer(drawable, this);
         }
@@ -351,18 +346,18 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         }
         if (drawable != null) {
             mDrawableWrapper.mDrawable = drawable;
-            mDrawableWrapper.mScaleType = mScaleType;
+            mDrawableWrapper.mScaleType = mBuilder.mScaleType;
             mDrawableWrapper.mDrawer = mDrawer;
         } else if (ImageLoader.getInstance().mFailedQuene.contains(mUrl)) {
-            mDrawableWrapper.mDrawable = mErrorDrawable;
-            mDrawableWrapper.mScaleType = mErrorScaleType;
+            mDrawableWrapper.mDrawable = mBuilder.mErrorDrawable;
+            mDrawableWrapper.mScaleType = mBuilder.mErrorScaleType;
             mDrawableWrapper.mDrawer = mErrorDrawer;
-            drawable = mErrorDrawable;
+            drawable = mBuilder.mErrorDrawable;
         } else {
-            mDrawableWrapper.mDrawable = mBlankDrawable;
-            mDrawableWrapper.mScaleType = mBlankScaleType;
+            mDrawableWrapper.mDrawable = mBuilder.mBlankDrawable;
+            mDrawableWrapper.mScaleType = mBuilder.mBlankScaleType;
             mDrawableWrapper.mDrawer = mBlankDrawer;
-            drawable = mBlankDrawable;
+            drawable = mBuilder.mBlankDrawable;
         }
         return drawable;
     }
@@ -374,24 +369,6 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         CustomDrawable drawable = ImageLoader.getInstance().getMemmory(mUrl, mDrawableWrapper.mViewWidth,
                 mDrawableWrapper.mViewHeight);
         return drawable;
-    }
-
-    public CustomImageView scaleType(ScaleType scaleType) {
-        setScaleType(scaleType);
-        return this;
-    }
-
-    public CustomImageView drawerType(int drawerType) {
-        if (mDrawerType != drawerType) {
-            mDrawerType = drawerType;
-            Drawable drawable = getDrawable();
-            if (drawable != null) {
-                mNeedComputeBounds = true;
-                mDrawer = DrawerFactory.getInstance(getContext()).getDrawer(drawable, mDrawerType, mDrawer);
-                invalidate();
-            }
-        }
-        return this;
     }
 
     public void url(String url) {
@@ -412,7 +389,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     private boolean isFastScroll() {
         boolean isFastScroll = false;
-        if (mActivity!=null) {
+        if (mActivity != null) {
             isFastScroll = mActivity.isFastScroll;
         }
         return isFastScroll;
@@ -423,7 +400,8 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             return;
         }
 
-        ImageLoader.getInstance().load(mUrl, mDrawableWrapper.mViewWidth, mDrawableWrapper.mViewHeight, mDecodeInfo,
+        ImageLoader.getInstance().load(mUrl, mDrawableWrapper.mViewWidth, mDrawableWrapper.mViewHeight, mBuilder
+                .mDecodeInfo,
                 this, isFastScroll());
         requestLayout();
         invalidate();
@@ -438,50 +416,16 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         clearAnimation();
     }
 
-    public CustomImageView blankImage(int resid, ScaleType scaleType, int drawerType) {
-        if (mBlankRes == resid && scaleType == mBlankScaleType && drawerType == mBlankDrawerType) {
-            return this;
-        }
-        mBlankRes = resid;
-        mBlankScaleType = scaleType;
-        mBlankDrawerType = drawerType;
-        mBlankDrawable = getContext().getResources().getDrawable(mBlankRes);
-        if (mBlankDrawable instanceof android.graphics.drawable.BitmapDrawable) {
-            mBlankDrawable = BitmapDrawableFactory
-                    .createBitmapDrawable(((android.graphics.drawable.BitmapDrawable) mBlankDrawable).getBitmap());
-        }
-        mBlankDrawer = DrawerFactory.getInstance(getContext())
-                .getDrawer(mBlankDrawable, mBlankDrawerType, mBlankDrawer);
-        return this;
-    }
-
-    public CustomImageView errorImage(int resid, ScaleType scaleType, int drawerType) {
-        if (mErrorRes == resid && scaleType == mErrorScaleType && drawerType == mErrorDrawerType) {
-            return this;
-        }
-        mErrorRes = resid;
-        mErrorScaleType = scaleType;
-        mErrorDrawerType = drawerType;
-        mErrorDrawable = getContext().getResources().getDrawable(resid);
-        if (mErrorDrawable instanceof android.graphics.drawable.BitmapDrawable) {
-            mErrorDrawable = BitmapDrawableFactory
-                    .createBitmapDrawable(((android.graphics.drawable.BitmapDrawable) mErrorDrawable).getBitmap());
-        }
-        mErrorDrawer = DrawerFactory.getInstance(getContext()).getDrawer(mErrorDrawable, drawerType, mErrorDrawer);
-        return this;
-    }
-
     private boolean mIsAttach;
-
 
     @Override
     public void onStartTemporaryDetach() {
-        if(!mIsAttach){
+        if (!mIsAttach) {
             return;
         }
         mIsAttach = false;
         super.onStartTemporaryDetach();
-        if(mActivity!=null){
+        if (mActivity != null) {
             mActivity.imageViews.remove(this);
         }
         stopLoad();
@@ -489,12 +433,12 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     public void onFinishTemporaryDetach() {
-        if(mIsAttach){
+        if (mIsAttach) {
             return;
         }
         mIsAttach = true;
         super.onFinishTemporaryDetach();
-        if(mActivity!=null){
+        if (mActivity != null) {
             mActivity.imageViews.add(this);
         }
         startLoad();
@@ -502,12 +446,12 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     protected void onAttachedToWindow() {
-        if(mIsAttach){
+        if (mIsAttach) {
             return;
         }
         mIsAttach = true;
         super.onAttachedToWindow();
-        if(mActivity!=null){
+        if (mActivity != null) {
             mActivity.imageViews.add(this);
         }
         startLoad();
@@ -515,12 +459,12 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     protected void onDetachedFromWindow() {
-        if(!mIsAttach){
+        if (!mIsAttach) {
             return;
         }
         mIsAttach = false;
         super.onDetachedFromWindow();
-        if(mActivity!=null){
+        if (mActivity != null) {
             mActivity.imageViews.remove(this);
         }
         stopLoad();
@@ -530,13 +474,13 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
         if (!hasWindowFocus) {
-            if(!mIsAttach){
+            if (!mIsAttach) {
                 return;
             }
             mIsAttach = false;
             stopLoad();
         } else {
-            if(mIsAttach){
+            if (mIsAttach) {
                 return;
             }
             mIsAttach = true;
@@ -551,9 +495,10 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     /**
      * dip转px
-     * 
+     *
      * @param context
      * @param dip
+     *
      * @return
      */
     public static int dipToPixel(Context context, int dip) {
@@ -573,7 +518,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     public void onLoadingFailed(UrlSizeKey key, Exception failReason) {
-        if(!mIsAttach){
+        if (!mIsAttach) {
             return;
         }
         if (key.mUrl.equals(mUrl) && key.mViewWidth == mDrawableWrapper.mViewWidth
@@ -589,14 +534,14 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     public void onLoadingComplete(UrlSizeKey key, CustomDrawable drawable, boolean fromMemmoryCache) {
-        if(!mIsAttach){
+        if (!mIsAttach) {
             return;
         }
         if (key.mUrl.equals(mUrl) && key.mViewWidth == mDrawableWrapper.mViewWidth
                 && key.mViewHeight == mDrawableWrapper.mViewHeight) {
             mNeedComputeBounds = true;
             clearAnimation();
-            mDrawer = DrawerFactory.getInstance(getContext()).getDrawer(drawable, mDrawerType, mDrawer);
+            mDrawer = DrawerFactory.getInstance(getContext()).getDrawer(drawable, mBuilder.mDrawerType, mDrawer);
             if (!fromMemmoryCache) {
                 Animation anim = new AlphaAnimation(0, 1);
                 anim.setInterpolator(new DecelerateInterpolator());
@@ -613,16 +558,279 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     public void onLoadingCancelled(UrlSizeKey key) {
-        if(!mIsAttach){
+        if (!mIsAttach) {
             return;
         }
-        if (mNeedResize) {
-            requestLayout();
+        if (key.mUrl.equals(mUrl) && key.mViewWidth == mDrawableWrapper.mViewWidth
+                && key.mViewHeight == mDrawableWrapper.mViewHeight) {
+            mNeedComputeBounds = true;
+            if (mNeedResize) {
+                requestLayout();
+            }
         }
+
     }
 
-    public DrawerArgs getDrawerArgs(){
-        return mArgs;
+    public CustomImageBuilder getBuilder(){
+        return mBuilder;
+    }
+
+
+    public static class CustomImageBuilder {
+
+        private boolean mContentChange;
+
+        private int mDrawerType = DrawerFactory.NORMAL;
+
+        private ScaleType mScaleType = ScaleType.FIT_XY;
+
+        private boolean mBlankContentChange;
+
+        private int mBlankRes = R.drawable.ic_default_picture;
+
+        private ScaleType mBlankScaleType = ScaleType.FIT_XY;
+
+        private int mBlankDrawerType = DrawerFactory.NORMAL;
+
+        private Drawable mBlankDrawable;
+
+        private boolean mErrorContentChange;
+
+        private int mErrorRes = R.drawable.ic_default_picture;
+
+        private ScaleType mErrorScaleType = ScaleType.FIT_XY;
+
+        private int mErrorDrawerType = DrawerFactory.NORMAL;
+
+        private Drawable mErrorDrawable;
+
+        private float mRadius;
+
+        private boolean mHasBorder;
+
+        private int mBorderWidth;
+
+        private int mBorderColor;
+
+        private boolean mIsNight;
+
+        private boolean mBorderSurroundContent;
+
+        private float mAlpha = 1.0f;
+
+        private Matrix mExtraMatrix;
+
+        private Path mPath = new Path();
+
+        private Path mBorderPath = new Path();
+
+        private DecodeInfo mDecodeInfo;
+
+        private DrawerArgs mArgs;
+
+        private CustomImageView mCiv;
+
+        private CustomImageBuilder(CustomImageView civ) {
+            mCiv = civ;
+            mArgs = new DrawerArgs();
+            mDecodeInfo = new DecodeInfo.DecodeInfoBuilder().build();
+            initBlank();
+            initError();
+        }
+
+        public CustomImageBuilder setDrawerType(int drawerType) {
+            if (mDrawerType != drawerType) {
+                mDrawerType = drawerType;
+                mContentChange = true;
+            }
+            return this;
+        }
+
+        public CustomImageBuilder setScaleType(ScaleType scaleType) {
+            if (mScaleType != scaleType) {
+                mScaleType = scaleType;
+                mCiv.mNeedComputeBounds = true;
+                mCiv.invalidate();
+            }
+            return this;
+        }
+
+        public CustomImageBuilder setBlankRes(int blankRes) {
+            if (mBlankRes != blankRes) {
+                mBlankRes = blankRes;
+                mBlankContentChange = true;
+            }
+            return this;
+        }
+
+        public CustomImageBuilder setBlankScaleType(ScaleType blankScaleType) {
+            if (mBlankScaleType != blankScaleType) {
+                mBlankScaleType = blankScaleType;
+                mCiv.mNeedComputeBounds = true;
+                mCiv.invalidate();
+            }
+            return this;
+        }
+
+        public CustomImageBuilder setBlankDrawerType(int blankDrawerType) {
+            if (mBlankDrawerType != blankDrawerType) {
+                mBlankDrawerType = blankDrawerType;
+                mBlankContentChange = true;
+            }
+            return this;
+        }
+
+        public CustomImageBuilder setErrorRes(int errorRes) {
+            if (mErrorRes != errorRes) {
+                mErrorRes = errorRes;
+                mErrorContentChange = true;
+            }
+            return this;
+        }
+
+        public CustomImageBuilder setErrorScaleType(ScaleType errorScaleType) {
+            if (mErrorScaleType != errorScaleType) {
+                mErrorScaleType = errorScaleType;
+                mCiv.mNeedComputeBounds = true;
+                mCiv.invalidate();
+            }
+            return this;
+        }
+
+        public CustomImageBuilder setErrorDrawerType(int errorDrawerType) {
+            if (mErrorDrawerType != errorDrawerType) {
+                mErrorDrawerType = errorDrawerType;
+                mErrorContentChange = true;
+            }
+            return this;
+        }
+
+        public CustomImageBuilder setRadius(float radius) {
+            mRadius = radius;
+            return this;
+        }
+
+        public CustomImageBuilder setHasBorder(boolean hasBorder) {
+            mHasBorder = hasBorder;
+            return this;
+        }
+
+        public CustomImageBuilder setBorderWidth(int borderWidth) {
+            mBorderWidth = borderWidth;
+            return this;
+        }
+
+        public CustomImageBuilder setBorderColor(int borderColor) {
+            mBorderColor = borderColor;
+            return this;
+        }
+
+        public CustomImageBuilder setNight(boolean night) {
+            mIsNight = night;
+            return this;
+        }
+
+        public CustomImageBuilder setBorderSurroundContent(boolean borderSurroundContent) {
+            mBorderSurroundContent = borderSurroundContent;
+            return this;
+        }
+
+        public CustomImageBuilder setAlpha(float alpha) {
+            mAlpha = alpha;
+            return this;
+        }
+
+        public CustomImageBuilder setExtraMatrix(Matrix extraMatrix) {
+            mExtraMatrix = extraMatrix;
+            return this;
+        }
+
+        public CustomImageBuilder setCustomPath(Path path) {
+            mPath = path;
+            return this;
+        }
+
+        public CustomImageBuilder setCustomBorderPath(Path borderPath) {
+            mBorderPath = borderPath;
+            return this;
+        }
+
+        private DrawerArgs mergeDrawArgs() {
+            mArgs.mRadius = mRadius;
+            mArgs.mHasBorder = mHasBorder;
+            mArgs.mBorderWidth = mBorderWidth;
+            mArgs.mBorderColor = mBorderColor;
+            mArgs.mIsNight = mIsNight;
+            mArgs.mBorderSurroundContent = mBorderSurroundContent;
+            mArgs.mAlpha = mAlpha;
+            mArgs.mExtraMatrix = mExtraMatrix;
+            mArgs.mPath = mPath;
+            mArgs.mBorderPath = mBorderPath;
+            mCiv.invalidate();
+            return mArgs;
+        }
+
+        private void initBlank() {
+            if (mBlankRes <= 0) {
+                return;
+            }
+            Drawable drawable = mCiv.getContext().getResources().getDrawable(mBlankRes);
+            if (drawable instanceof android.graphics.drawable.BitmapDrawable) {
+                drawable = BitmapDrawableFactory
+                        .createBitmapDrawable(((android.graphics.drawable.BitmapDrawable) drawable).getBitmap());
+            }
+            mBlankDrawable = drawable;
+            mCiv.mNeedComputeBounds = true;
+            mCiv.mBlankDrawer = DrawerFactory.getInstance(mCiv.getContext()).getDrawer(drawable, mBlankDrawerType,
+                    mCiv.mBlankDrawer);
+            mCiv.invalidate();
+        }
+
+        private void initError() {
+            if (mErrorRes <= 0) {
+                return;
+            }
+            Drawable drawable = mCiv.getContext().getResources().getDrawable(mErrorRes);
+            if (drawable instanceof android.graphics.drawable.BitmapDrawable) {
+                drawable = BitmapDrawableFactory
+                        .createBitmapDrawable(((android.graphics.drawable.BitmapDrawable) drawable).getBitmap());
+            }
+            mErrorDrawable = drawable;
+            mCiv.mNeedComputeBounds = true;
+            mCiv.mErrorDrawer = DrawerFactory.getInstance(mCiv.getContext()).getDrawer(drawable, mErrorDrawerType,
+                    mCiv.mErrorDrawer);
+            mCiv.invalidate();
+        }
+
+        public CustomImageView build() {
+            if (mCiv == null) {
+                return null;
+            }
+            if (mBlankContentChange) {
+                initBlank();
+                mBlankContentChange = false;
+            }
+
+            if (mErrorContentChange) {
+                initError();
+                mErrorContentChange = false;
+            }
+
+            if (mContentChange) {
+                Drawable drawable = mCiv.getDrawable();
+                if (drawable != null) {
+                    mCiv.mNeedComputeBounds = true;
+                    mCiv.mDrawer = DrawerFactory.getInstance(mCiv.getContext()).getDrawer(drawable, mDrawerType,
+                            mCiv.mDrawer);
+                    mCiv.invalidate();
+                }
+                mContentChange = false;
+            }
+
+            mergeDrawArgs();
+            return mCiv;
+        }
+
     }
 
 }

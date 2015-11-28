@@ -1,6 +1,7 @@
 package com.baidu.iknow.imageloader.drawer;
 
 import android.graphics.Canvas;
+import android.graphics.Path;
 import android.graphics.Rect;
 
 import com.baidu.iknow.imageloader.drawable.DrawableWrapper;
@@ -28,7 +29,13 @@ public class NormalDrawer extends AbsDrawer{
 
     @Override
     public void drawBorder(Canvas canvas, DrawableWrapper drawable) {
-        
+        if (!mArgs.mHasBorder) {
+            return;
+        }
+        mArgs.mBorderPath.reset();
+        mArgs.mBorderPath.addRect(mBorderRect, Path.Direction.CW);
+        canvas.concat(mDrawMatrix);
+        canvas.drawPath(mArgs.mBorderPath, mBorderPaint);
     }
 
 }
