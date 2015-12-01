@@ -7,7 +7,7 @@ import android.util.Log;
  */
 public class ImageLoaderLog {
 
-    public static boolean DEBUG = true;
+    public static boolean DEBUG = false;
 
     private ImageLoaderLog() {
 

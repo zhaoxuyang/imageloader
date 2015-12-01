@@ -76,14 +76,13 @@ public class ImageLoader {
         public void onLoadingFailed(UrlSizeKey key, Exception failReason) {
             ImageLoadTask task = mTasks.remove(key);
             mRunningQuene.remove(task);
-            HashSet<ImageLoadingListener> listenersSet = mListeners.get(key);
+            HashSet<ImageLoadingListener> listenersSet = mListeners.remove(key);
             if (listenersSet != null) {
                 Iterator<ImageLoadingListener> iter = listenersSet.iterator();
                 while (iter.hasNext()) {
                     ImageLoadingListener listener = iter.next();
                     listener.onLoadingFailed(key, failReason);
                 }
-                mListeners.remove(key);
                 ImageLoaderLog.d(TAG, "failed URL:" + key.mUrl + ",width:" + key.mViewWidth + ",height:" + key.mViewHeight);
             }
             mFailedQuene.offer(key.mUrl);
@@ -92,19 +91,28 @@ public class ImageLoader {
 
         @Override
         public void onLoadingComplete(UrlSizeKey key, CustomDrawable drawable, boolean fromMemmoryCache) {
-            mMemmoryCache.put(UrlSizeKey.obtain(key), drawable);
             ImageLoadTask task = mTasks.remove(key);
             mRunningQuene.remove(task);
-            HashSet<ImageLoadingListener> listenersSet = mListeners.get(key);
-            if (listenersSet != null) {
-                Iterator<ImageLoadingListener> iter = listenersSet.iterator();
-                while (iter.hasNext()) {
-                    ImageLoadingListener listener = iter.next();
-                    listener.onLoadingComplete(key, drawable, fromMemmoryCache);
+            HashSet<ImageLoadingListener> listenersSet = mListeners.remove(key);
+            if(drawable.checkLegal()){
+                if(!fromMemmoryCache){
+                    mMemmoryCache.put(UrlSizeKey.obtain(key), drawable);
                 }
-                mListeners.remove(key);
-                ImageLoaderLog.d(TAG, "complete URL:" + key.mUrl + ",width:" + key.mViewWidth + ",height:" + key.mViewHeight);
+                if (listenersSet != null) {
+                    Iterator<ImageLoadingListener> iter = listenersSet.iterator();
+                    while (iter.hasNext()) {
+                        ImageLoadingListener listener = iter.next();
+                        listener.onLoadingComplete(key, drawable, fromMemmoryCache);
+                    }
+                    ImageLoaderLog.d(TAG, "complete URL:" + key.mUrl + ",width:" + key.mViewWidth + ",height:" + key.mViewHeight);
+                }
+            }else{
+                UrlSizeKey newkey = UrlSizeKey.obtain(key);
+                mTasks.put(newkey,task);
+                mWaitingQuene.add(task);
+                mListeners.put(newkey,listenersSet);
             }
+
             runNext();
         }
 
@@ -113,14 +121,13 @@ public class ImageLoader {
             ImageLoadTask task = mTasks.remove(key);
             mRunningQuene.remove(task);
             mWaitingQuene.remove(task);
-            HashSet<ImageLoadingListener> listenersSet = mListeners.get(key);
+            HashSet<ImageLoadingListener> listenersSet = mListeners.remove(key);
             if (listenersSet != null) {
                 Iterator<ImageLoadingListener> iter = listenersSet.iterator();
                 while (iter.hasNext()) {
                     ImageLoadingListener listener = iter.next();
                     listener.onLoadingCancelled(key);
                 }
-                mListeners.remove(key);
             }
             runNext();
         }

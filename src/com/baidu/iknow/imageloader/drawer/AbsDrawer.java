@@ -217,8 +217,7 @@ public abstract class AbsDrawer {
 	 * 绘制时的一些公共逻辑，绘制的时候不包括padding
 	 * 
 	 * @param canvas
-	 * @param image
-	 * @param view
+	 * @param drawable
 	 */
 	public void drawContent(Canvas canvas, DrawableWrapper drawable) {
 
@@ -314,7 +313,7 @@ public abstract class AbsDrawer {
 	 * 计算好矩阵后将矩阵应用到绘制逻辑，子类实现
 	 * 
 	 * @param bm
-	 * @param iv
+	 * @param drawable
 	 */
 	public abstract boolean applyBounds(DrawableWrapper drawable);
 
@@ -322,8 +321,7 @@ public abstract class AbsDrawer {
 	 * 真正绘制内容的方法，子类实现
 	 * 
 	 * @param canvas
-	 * @param view
-	 * @param bm
+	 * @param drawable
 	 */
 	public abstract void drawContentReal(Canvas canvas, DrawableWrapper drawable);
 
@@ -331,7 +329,7 @@ public abstract class AbsDrawer {
 	 * 绘制边框的方法，子类实现
 	 * 
 	 * @param canvas
-	 * @param view
+	 * @param drawable
 	 */
 	public abstract void drawBorder(Canvas canvas, DrawableWrapper drawable);
 

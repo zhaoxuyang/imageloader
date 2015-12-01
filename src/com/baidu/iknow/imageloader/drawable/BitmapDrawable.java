@@ -56,7 +56,6 @@ public class BitmapDrawable extends CustomDrawable {
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
                 BitmapLock.unlockBitmap(mBitmap);
             }
-            mBitmap.recycle();
             mBitmap = null;
             mShader = null;
             mScaledWidth = 0;

@@ -20,6 +20,8 @@ public class MemmoryLruCache extends LruCache<UrlSizeKey, CustomDrawable> {
         super(size);
     }
 
+
+
     @Override
     protected void entryRemoved(boolean evicted, UrlSizeKey key, CustomDrawable oldValue, CustomDrawable newValue) {
 

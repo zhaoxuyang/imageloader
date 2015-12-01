@@ -24,6 +24,7 @@ import android.graphics.Path;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -136,6 +137,11 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             }
 
             mBuilder.mergeDrawArgs();
+            if(mPendingDrawable!=null){
+                setImageDrawable(mPendingDrawable);
+            }
+
+            mIsVisible = getVisibility()==View.VISIBLE;
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -315,8 +321,14 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         return mBuilder.mScaleType;
     }
 
+    private Drawable mPendingDrawable;
+
     @Override
     public void setImageDrawable(Drawable drawable) {
+        if(mBuilder==null){
+            mPendingDrawable = drawable;
+            return;
+        }
         if (drawable instanceof android.graphics.drawable.BitmapDrawable) {
             BitmapDrawable bd = BitmapDrawableFactory
                     .createBitmapDrawable(((android.graphics.drawable.BitmapDrawable) drawable).getBitmap());
@@ -400,6 +412,10 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             return;
         }
 
+        if(!mIsAttach || !mIsVisible){
+            return;
+        }
+
         ImageLoader.getInstance().load(mUrl, mDrawableWrapper.mViewWidth, mDrawableWrapper.mViewHeight, mBuilder
                 .mDecodeInfo,
                 this, isFastScroll());
@@ -417,6 +433,8 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     }
 
     private boolean mIsAttach;
+
+    private boolean mIsVisible;
 
     @Override
     public void onStartTemporaryDetach() {
@@ -474,16 +492,26 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
         if (!hasWindowFocus) {
-            if (!mIsAttach) {
-                return;
-            }
-            mIsAttach = false;
             stopLoad();
         } else {
-            if (mIsAttach) {
+            startLoad();
+        }
+    }
+
+    @Override
+    protected void onVisibilityChanged(View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        if (visibility!=View.VISIBLE) {
+            if(!mIsVisible){
                 return;
             }
-            mIsAttach = true;
+            mIsVisible = false;
+            stopLoad();
+        } else {
+            if(mIsVisible){
+                return;
+            }
+            mIsVisible = true;
             startLoad();
         }
     }
