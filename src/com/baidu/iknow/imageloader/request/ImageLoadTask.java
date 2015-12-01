@@ -31,6 +31,10 @@ public class ImageLoadTask extends AsyncTask<UrlSizeKey, Integer, CustomDrawable
     private DataFetcher<InputStream> mHttpUrlFetcher;
 
     private Exception mException;
+    
+    public ImageLoadTask(){
+        mDecodeInfo = new DecodeInfo.DecodeInfoBuilder().build();
+    }
 
     @Override
     protected void onPreExecute() {

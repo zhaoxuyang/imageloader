@@ -26,6 +26,7 @@ public class BitmapDecoder extends BaseDecoder {
     @SuppressLint("NewApi")
     @Override
     public CustomDrawable doDecode(byte[] bytes, DecodeInfo decodeInfo, int viewWidth, int viewHeight) {
+        long threadId = Thread.currentThread().getId();
         Options opts = decodeInfo.mBitmapOptions;
         opts.inJustDecodeBounds = true;
         opts.inSampleSize = 1;
@@ -37,7 +38,8 @@ public class BitmapDecoder extends BaseDecoder {
         BitmapFactory.decodeByteArray(bytes, 0, bytes.length, opts);
         int bitmapWidth = opts.outWidth;
         int bitmapHeight = opts.outHeight;
-        ImageLoaderLog.d(TAG, "bitmap width:" + bitmapWidth + ",height:" + bitmapHeight);
+        ImageLoaderLog.d(TAG, threadId+" bitmap width:" + bitmapWidth + ",height:" + bitmapHeight);
+        ImageLoaderLog.d(TAG, threadId+" view width:" + viewWidth + ",height:" + viewHeight);
         if (bitmapWidth <= 0 || bitmapHeight <= 0) {
             return null;
         }
@@ -49,6 +51,7 @@ public class BitmapDecoder extends BaseDecoder {
                 sampleSize *= 2;
             }
         }
+        ImageLoaderLog.d(TAG,threadId+" sampleSize:"+sampleSize);
         opts.inJustDecodeBounds = false;
         opts.inSampleSize = sampleSize;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -60,13 +63,13 @@ public class BitmapDecoder extends BaseDecoder {
         try{
             bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, opts);
         }catch(Exception e){
-            ImageLoaderLog.d(TAG, "bitmap decode error");
+            ImageLoaderLog.d(TAG, threadId+" bitmap decode error");
             e.printStackTrace();
             return null;
         }
 
         if (bm != null) {
-            ImageLoaderLog.d(TAG, "after bitmap width:" + bm.getWidth() + ",height:" + bm.getHeight());
+            ImageLoaderLog.d(TAG, threadId+" after bitmap width:" + bm.getWidth() + ",height:" + bm.getHeight());
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                 BitmapLock.lockBitmap(bm);
             }

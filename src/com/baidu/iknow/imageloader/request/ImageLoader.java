@@ -168,14 +168,9 @@ public class ImageLoader {
         }
     }
 
-    public void load(String url, int width, int height, DecodeInfo decodeInfo, ImageLoadingListener listener,
+    public void load(String url, int width, int height, ImageLoadingListener listener,
             boolean isFastScroll) {
 
-
-        if (decodeInfo == null) {
-            decodeInfo = new DecodeInfo.DecodeInfoBuilder().build();
-        }
-        
         if (listener == null) {
             listener = mEmptyListener;
         }
@@ -212,7 +207,6 @@ public class ImageLoader {
         ImageLoadTask task = new ImageLoadTask();
         task.mImageLoadingListener = mDispatchListener;
         task.mKey = key;
-        task.mDecodeInfo = decodeInfo;
         mTasks.put(key, task);
         mWaitingQuene.offer(task);
         HashSet<ImageLoadingListener> listeners = new HashSet<ImageLoadingListener>();

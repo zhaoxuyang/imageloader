@@ -416,8 +416,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             return;
         }
 
-        ImageLoader.getInstance().load(mUrl, mDrawableWrapper.mViewWidth, mDrawableWrapper.mViewHeight, mBuilder
-                .mDecodeInfo,
+        ImageLoader.getInstance().load(mUrl, mDrawableWrapper.mViewWidth, mDrawableWrapper.mViewHeight,
                 this, isFastScroll());
         requestLayout();
         invalidate();
@@ -652,8 +651,6 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
         private Path mBorderPath = new Path();
 
-        private DecodeInfo mDecodeInfo;
-
         private DrawerArgs mArgs;
 
         private CustomImageView mCiv;
@@ -661,7 +658,6 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         private CustomImageBuilder(CustomImageView civ) {
             mCiv = civ;
             mArgs = new DrawerArgs();
-            mDecodeInfo = new DecodeInfo.DecodeInfoBuilder().build();
             initBlank();
             initError();
         }
