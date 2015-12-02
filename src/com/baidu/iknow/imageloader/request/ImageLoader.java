@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import com.baidu.iknow.imageloader.cache.BitmapPool;
+import com.baidu.iknow.imageloader.cache.ByteArrayPool;
 import com.baidu.iknow.imageloader.cache.DiskCache;
 import com.baidu.iknow.imageloader.cache.ExternalCacheDiskCacheFactory;
 import com.baidu.iknow.imageloader.cache.ImageLoaderLog;
@@ -15,18 +16,16 @@ import com.baidu.iknow.imageloader.cache.InternalCacheDiskCacheFactory;
 import com.baidu.iknow.imageloader.cache.MemmoryLruCache;
 import com.baidu.iknow.imageloader.cache.MemorySizeCalculator;
 import com.baidu.iknow.imageloader.cache.UrlSizeKey;
-import com.baidu.iknow.imageloader.decoder.DecodeInfo;
 import com.baidu.iknow.imageloader.drawable.CustomDrawable;
 
 import android.content.Context;
 import android.os.Environment;
 import android.os.StatFs;
 import android.text.TextUtils;
-import android.util.Log;
 
 /**
  * 图片加载器
- * 
+ *
  * @author zhaoxuyang
  * @since 2015-10-12
  */
@@ -43,6 +42,8 @@ public class ImageLoader {
     public BitmapPool mBitmapPool;
 
     public MemmoryLruCache mMemmoryCache;
+
+    public ByteArrayPool mByteArrayPool;
 
     public DiskCache mDiskLruCache;
 
@@ -148,6 +149,7 @@ public class ImageLoader {
         mGifBitmapPool = new BitmapPool(memorySizeCalator.getGifBitmapPoolSize(),"gif");
         mBitmapPool = new BitmapPool(memorySizeCalator.getBitmapPoolSize(),"bitmap");
         mMemmoryCache = new MemmoryLruCache(memorySizeCalator.getMemoryCacheSize());
+        mByteArrayPool = new ByteArrayPool(memorySizeCalator.getArrayPoolSizeInBytes());
         boolean hasExtrenalStorage = true;
         String state = Environment.getExternalStorageState();
         if (state.equals(Environment.MEDIA_MOUNTED)) {
@@ -169,7 +171,9 @@ public class ImageLoader {
     }
 
     public void load(String url, int width, int height, ImageLoadingListener listener,
-            boolean isFastScroll) {
+                     boolean isFastScroll) {
+
+        ImageLoaderLog.d(TAG, "startload URL:" + url + ",width:" + width + ",height:" + height);
 
         if (listener == null) {
             listener = mEmptyListener;
@@ -190,6 +194,8 @@ public class ImageLoader {
         }
 
         if (isFastScroll) {
+            ImageLoaderLog.d(TAG,"is fast scroll:"+url);
+            release(key);
             return;
         }
 

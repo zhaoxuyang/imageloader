@@ -12,7 +12,6 @@ import android.graphics.PointF;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.RectF;
-import android.util.Log;
 import android.widget.ImageView.ScaleType;
 
 

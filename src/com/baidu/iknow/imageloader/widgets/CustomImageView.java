@@ -1,8 +1,8 @@
 package com.baidu.iknow.imageloader.widgets;
 
 import com.baidu.iknow.imageloader.R;
+import com.baidu.iknow.imageloader.cache.ImageLoaderLog;
 import com.baidu.iknow.imageloader.cache.UrlSizeKey;
-import com.baidu.iknow.imageloader.decoder.DecodeInfo;
 import com.baidu.iknow.imageloader.drawable.BitmapDrawable;
 import com.baidu.iknow.imageloader.drawable.BitmapDrawable.BitmapDrawableFactory;
 import com.baidu.iknow.imageloader.drawable.CustomDrawable;
@@ -408,6 +408,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     }
 
     private void startLoad() {
+        ImageLoaderLog.d(TAG,"mHasFrame:"+mHasFrame+",mIsAttach:"+mIsAttach+",mIsVisible:"+mIsVisible+",url:"+mUrl);
         if (!mHasFrame) {
             return;
         }
@@ -467,6 +468,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             return;
         }
         mIsAttach = true;
+        mIsVisible = getVisibility()==View.VISIBLE;
         super.onAttachedToWindow();
         if (mActivity != null) {
             mActivity.imageViews.add(this);
@@ -500,6 +502,24 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     @Override
     protected void onVisibilityChanged(View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
+        if (visibility!=View.VISIBLE) {
+            if(!mIsVisible){
+                return;
+            }
+            mIsVisible = false;
+            stopLoad();
+        } else {
+            if(mIsVisible){
+                return;
+            }
+            mIsVisible = true;
+            startLoad();
+        }
+    }
+
+    @Override
+    public void setVisibility(int visibility) {
+        super.setVisibility(visibility);
         if (visibility!=View.VISIBLE) {
             if(!mIsVisible){
                 return;

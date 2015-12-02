@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.baidu.iknow.imageloader.drawable.CustomDrawable;
-import com.baidu.iknow.imageloader.drawer.DrawerArgs;
 import com.baidu.iknow.imageloader.drawer.DrawerFactory;
 import com.baidu.iknow.imageloader.widgets.CustomActivity;
 import com.baidu.iknow.imageloader.widgets.CustomImageView;

@@ -36,7 +36,7 @@ public class UrlSizeKey {
 
     @Override
     public int hashCode() {
-        int h = mUrl == null ? 0 : mUrl.hashCode();
+        int h = (mUrl == null ? 0 : mUrl.hashCode());
         return h;
     }
 

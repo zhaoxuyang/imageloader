@@ -46,7 +46,7 @@ public final class MemorySizeCalculator {
         int targetGifPoolSize = Math.round(screenSize * gifPoolScreens);
         int availableSize = maxSize - arrayPoolSize;
 
-        if (targetMemoryCacheSize + targetPoolSize <= availableSize) {
+        if ((targetMemoryCacheSize + targetPoolSize + targetGifPoolSize)<= availableSize) {
             memoryCacheSize = targetMemoryCacheSize;
             bitmapPoolSize = targetPoolSize;
             gifPoolSize = targetGifPoolSize;

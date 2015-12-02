@@ -5,8 +5,6 @@ import java.util.Iterator;
 import android.content.Context;
 import android.os.Handler;
 import android.util.AttributeSet;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
 

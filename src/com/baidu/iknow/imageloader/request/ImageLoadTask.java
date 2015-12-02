@@ -1,9 +1,9 @@
 package com.baidu.iknow.imageloader.request;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.baidu.iknow.imageloader.cache.PoolingByteArrayOutputStream;
 import com.baidu.iknow.imageloader.cache.UrlSizeKey;
 import com.baidu.iknow.imageloader.cache.DiskLruCache.Snapshot;
 import com.baidu.iknow.imageloader.decoder.BaseDecoder;
@@ -14,7 +14,7 @@ import com.baidu.iknow.imageloader.request.DataFetcher.DataCallback;
 
 /**
  * 图片加载任务
- * 
+ *
  * @author zhaoxuyang
  * @since 2015-10-12
  */
@@ -22,16 +22,20 @@ public class ImageLoadTask extends AsyncTask<UrlSizeKey, Integer, CustomDrawable
 
     private static final String TAG = ImageLoadTask.class.getSimpleName();
 
+    public static final  int RETYR_MAX_COUNT = 1;
+
     public ImageLoadingListener mImageLoadingListener;
 
     public UrlSizeKey mKey;
 
-    public DecodeInfo mDecodeInfo;
+    private DecodeInfo mDecodeInfo;
+
+    public int retryCount;
 
     private DataFetcher<InputStream> mHttpUrlFetcher;
 
     private Exception mException;
-    
+
     public ImageLoadTask(){
         mDecodeInfo = new DecodeInfo.DecodeInfoBuilder().build();
     }
@@ -127,7 +131,7 @@ public class ImageLoadTask extends AsyncTask<UrlSizeKey, Integer, CustomDrawable
             return null;
         }
         InputStream is = ss.getInputStream(0);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PoolingByteArrayOutputStream baos = new PoolingByteArrayOutputStream(ImageLoader.getInstance().mByteArrayPool);
         try {
             byte[] buffer = new byte[1024];
             int len = 0;
@@ -141,12 +145,14 @@ public class ImageLoadTask extends AsyncTask<UrlSizeKey, Integer, CustomDrawable
         } catch (IOException e) {
             mException = e;
         } finally {
-            ss.close();
             try {
                 baos.close();
             } catch (IOException e) {
                 e.printStackTrace();
+            }finally {
+                ss.close();
             }
+
         }
         return null;
     }

@@ -1,6 +1,5 @@
 package com.baidu.iknow.imageloader.decoder;
 
-import android.util.Log;
 
 import com.baidu.iknow.imageloader.cache.ImageLoaderLog;
 import com.baidu.iknow.imageloader.drawable.CustomDrawable;

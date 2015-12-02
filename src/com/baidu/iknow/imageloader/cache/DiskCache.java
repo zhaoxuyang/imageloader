@@ -16,7 +16,7 @@ public interface DiskCache {
   interface Factory {
 
       int DEFAULT_DISK_CACHE_SIZE = 250 * 1024 * 1024;
-      String DEFAULT_DISK_CACHE_DIR = "image_manager_disk_cache";
+      String DEFAULT_DISK_CACHE_DIR = "image_loader_disk_cache";
       @Nullable
       DiskCache build();
   }

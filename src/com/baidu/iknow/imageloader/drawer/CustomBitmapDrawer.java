@@ -3,7 +3,6 @@ package com.baidu.iknow.imageloader.drawer;
 import com.baidu.iknow.imageloader.drawable.DrawableWrapper;
 
 import android.graphics.Canvas;
-import android.graphics.Path.Direction;
 
 public class CustomBitmapDrawer extends BitmapShaderDrawer{
 

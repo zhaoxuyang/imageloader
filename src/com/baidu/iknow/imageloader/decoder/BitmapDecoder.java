@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.os.Build;
-import android.util.Log;
 
 import com.baidu.iknow.imageloader.bitmap.BitmapLock;
 import com.baidu.iknow.imageloader.cache.ImageLoaderLog;

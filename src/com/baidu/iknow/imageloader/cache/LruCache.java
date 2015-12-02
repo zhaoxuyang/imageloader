@@ -19,7 +19,6 @@ package com.baidu.iknow.imageloader.cache;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import android.util.Log;
 
 /**
  * Static library version of {@link android.util.LruCache}. Used to write apps
