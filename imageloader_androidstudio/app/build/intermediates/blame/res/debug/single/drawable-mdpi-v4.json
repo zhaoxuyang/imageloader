@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "/Users/zhaoxuyang/Documents/imageloader_androidstudio/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/ic_launcher.png",
+        "source": "/Users/zhaoxuyang/Documents/imageloader_androidstudio/app/src/main/res/drawable-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "/Users/zhaoxuyang/Documents/imageloader_androidstudio/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/a.jpg",
+        "source": "/Users/zhaoxuyang/Documents/imageloader_androidstudio/app/src/main/res/drawable-mdpi/a.jpg"
+    }
+]

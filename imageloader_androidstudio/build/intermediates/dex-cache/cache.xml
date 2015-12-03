@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/Users/zhaoxuyang/Documents/imageloader_androidstudio/app/build/intermediates/incremental-runtime-classes/debug/instant-run.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="f3c69209f92a45b318d4bb4e82788c8011826e3b">
+        <dex dex="/Users/zhaoxuyang/Documents/imageloader_androidstudio/app/build/intermediates/pre-dexed/debug/instant-run_401ca3c7b58e6718cd8e57fb95412b5b90b6ace3.jar" />
+    </item>
+    <item
+        jar="/Users/zhaoxuyang/Documents/imageloader_androidstudio/app/libs/android-support-v4.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="3e4e879d0b3dc11f2feb3f55e77e3b5bd82c4a28">
+        <dex dex="/Users/zhaoxuyang/Documents/imageloader_androidstudio/app/build/intermediates/pre-dexed/debug/android-support-v4_d2f54840fd50b16a15b106e7a35bbc0d5ecfddf7.jar" />
+    </item>
+    <item
+        jar="/Users/zhaoxuyang/Documents/imageloader_androidstudio/app/build/intermediates/incremental-classes/debug/classes.jar"
+        jumboMode="false"
+        revision="23.0.2"
+        sha1="7e646d790162e694ecfea5a51a7bf84b5152113f">
+        <dex dex="/Users/zhaoxuyang/Documents/imageloader_androidstudio/app/build/intermediates/pre-dexed/debug/classes_211d5e342c270a7ca8fc0d688ca98db83c71d597.jar" />
+    </item>
+
+</items>

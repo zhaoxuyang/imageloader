@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CustomImageView"><attr format="dimension" name="civ_radius"/><attr format="boolean" name="civ_hasBorder"/><attr format="dimension" name="civ_borderWidth"/><attr format="color|reference" name="civ_borderColor"/><attr format="boolean" name="civ_borderSurroundContent"/><attr format="boolean" name="civ_isNight"/><attr format="float" name="civ_alpha"/><attr format="enum" name="civ_drawerType"><enum name="normal" value="0"/><enum name="round_rect" value="1"/><enum name="circle" value="2"/><enum name="custom" value="3"/></attr></declare-styleable>
+    <string name="app_name">myimageloader</string>
+    <style name="AppBaseTheme" parent="android:Theme.Light">
+        <!--
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        -->
+    </style>
+    <style name="AppTheme" parent="AppBaseTheme">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+</resources>
