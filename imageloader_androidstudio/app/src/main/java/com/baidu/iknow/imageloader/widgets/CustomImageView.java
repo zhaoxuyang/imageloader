@@ -864,13 +864,6 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             mBlankDrawable = drawable;
             mCiv.mNeedComputeBounds = true;
 
-            if (mBlankDrawerType == -1) {
-                mBlankDrawerType = mDrawerType;
-            }
-            if (mBlankScaleType == null) {
-                mBlankScaleType = mScaleType;
-            }
-
             mCiv.mBlankDrawer = DrawerFactory.getInstance(mCiv.getContext()).getDrawer(drawable, mBlankDrawerType,
                     mCiv.mBlankDrawer);
             mCiv.invalidate();
@@ -888,6 +881,20 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             mErrorDrawable = drawable;
             mCiv.mNeedComputeBounds = true;
 
+            mCiv.mErrorDrawer = DrawerFactory.getInstance(mCiv.getContext()).getDrawer(drawable, mErrorDrawerType,
+                    mCiv.mErrorDrawer);
+            mCiv.invalidate();
+        }
+
+        public CustomImageView build() {
+
+            if (mBlankDrawerType == -1) {
+                mBlankDrawerType = mDrawerType;
+            }
+            if (mBlankScaleType == null) {
+                mBlankScaleType = mScaleType;
+            }
+
             if (mErrorDrawerType == -1) {
                 mErrorDrawerType = mDrawerType;
             }
@@ -895,12 +902,6 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
                 mErrorScaleType = mScaleType;
             }
 
-            mCiv.mErrorDrawer = DrawerFactory.getInstance(mCiv.getContext()).getDrawer(drawable, mErrorDrawerType,
-                    mCiv.mErrorDrawer);
-            mCiv.invalidate();
-        }
-
-        public CustomImageView build() {
             if (mCiv == null) {
                 return null;
             }

@@ -96,4 +96,15 @@ public class CustomListView extends ListView {
 
     }
 
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        mActivity.mListViews.add(this);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        mActivity.mListViews.remove(this);
+    }
 }
