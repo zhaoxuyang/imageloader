@@ -673,9 +673,9 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
         private int mBlankRes = R.drawable.ic_default_picture;
 
-        private ScaleType mBlankScaleType = ScaleType.FIT_XY;
+        private ScaleType mBlankScaleType = null;
 
-        private int mBlankDrawerType = DrawerFactory.NORMAL;
+        private int mBlankDrawerType = -1;
 
         private Drawable mBlankDrawable;
 
@@ -683,9 +683,9 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
         private int mErrorRes = R.drawable.ic_default_picture;
 
-        private ScaleType mErrorScaleType = ScaleType.FIT_XY;
+        private ScaleType mErrorScaleType = null;
 
-        private int mErrorDrawerType = DrawerFactory.NORMAL;
+        private int mErrorDrawerType = -1;
 
         private Drawable mErrorDrawable;
 
@@ -863,6 +863,14 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             }
             mBlankDrawable = drawable;
             mCiv.mNeedComputeBounds = true;
+
+            if (mBlankDrawerType == -1) {
+                mBlankDrawerType = mDrawerType;
+            }
+            if (mBlankScaleType == null) {
+                mBlankScaleType = mScaleType;
+            }
+
             mCiv.mBlankDrawer = DrawerFactory.getInstance(mCiv.getContext()).getDrawer(drawable, mBlankDrawerType,
                     mCiv.mBlankDrawer);
             mCiv.invalidate();
@@ -879,6 +887,14 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             }
             mErrorDrawable = drawable;
             mCiv.mNeedComputeBounds = true;
+
+            if (mErrorDrawerType == -1) {
+                mErrorDrawerType = mDrawerType;
+            }
+            if (mBlankScaleType == null) {
+                mErrorScaleType = mScaleType;
+            }
+
             mCiv.mErrorDrawer = DrawerFactory.getInstance(mCiv.getContext()).getDrawer(drawable, mErrorDrawerType,
                     mCiv.mErrorDrawer);
             mCiv.invalidate();
