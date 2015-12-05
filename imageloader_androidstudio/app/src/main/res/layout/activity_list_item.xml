@@ -12,12 +12,6 @@
         android:layout_weight="1" >
     </com.baidu.iknow.imageloader.widgets.CustomListView>
 
-    <Button 
-        android:id="@+id/nextpage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="launch"
-        android:onClick="onClick"/>
     <HorizontalScrollView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >

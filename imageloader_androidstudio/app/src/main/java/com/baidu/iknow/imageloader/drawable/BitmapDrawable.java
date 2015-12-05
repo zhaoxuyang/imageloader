@@ -75,10 +75,14 @@ public class BitmapDrawable extends CustomDrawable {
         if (mBitmap == null || mBitmap.isRecycled()) {
             return 0;
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            return mBitmap.getAllocationByteCount();
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
-            return mBitmap.getByteCount();
+        try{
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                return mBitmap.getAllocationByteCount();
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
+                return mBitmap.getByteCount();
+            }
+        }catch(Exception e){
+
         }
         return mBitmap.getRowBytes() * mBitmap.getHeight();
     }
