@@ -1,8 +1,10 @@
-.metadata/
-bin/
-gen/
-.settings/
-target/
+*/.metadata/
+*/bin/
+*/gen/
+*/.settings/
+*/target/
+*/obj/
+*/jni/
 
 
 # Mobile Tools for Java (J2ME)
@@ -20,3 +22,12 @@ target/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+*.iml
+*/.gradle
+*/local.properties
+*/.idea/workspace.xml
+*/.idea/libraries
+.DS_Store
+*/build
+*/captures
