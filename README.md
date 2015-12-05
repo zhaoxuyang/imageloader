@@ -3,10 +3,10 @@
 
 Android图片加载框架
 
-![Screenshot](https://github.com/zhaoxuyang/imageloader/blob/master/imageloader1.png)
+![Screenshot](https://github.com/zhaoxuyang/imageloader/raw/master/imageloader1.png)
 
 
-![Screenshot](https://github.com/zhaoxuyang/imageloader/blob/master/imageloader2.png)
+![Screenshot](https://github.com/zhaoxuyang/imageloader/raw/master/imageloader2.png)
 
 
 ## 特性
