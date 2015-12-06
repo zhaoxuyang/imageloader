@@ -285,23 +285,11 @@ public class ImageLoader {
             if (mWaitingQuene.contains(task)) {
                 HashSet<ImageLoadingListener> listeners = mListeners.get(key);
                 listeners.remove(listener);
+                listener.onLoadingCancelled(key);
                 if (listeners.isEmpty()) {
                     mWaitingQuene.remove(task);
                     mTasks.remove(key);
                     mListeners.remove(key);
-                }
-            } else {
-                ImageLoaderLog.d(TAG, "cancel running URL:" + url + ",width:" + width + ",height:" + height);
-                HashSet<ImageLoadingListener> listeners = mListeners.get(key);
-                listeners.remove(listener);
-                if (listeners.isEmpty()) {
-                    boolean res = task.cancel(true);
-                    if (res) {
-                        mRunningQuene.remove(task);
-                        mTasks.remove(key);
-                        mListeners.remove(key);
-                    }
-
                 }
             }
 
