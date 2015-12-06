@@ -5,7 +5,6 @@ import java.lang.reflect.Method;
 
 import com.baidu.iknow.imageloader.cache.ImageLoaderLog;
 
-import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +21,8 @@ public class CustomFragment extends Fragment{
     static {
         try {
             dispatchVisibilityChanged = ViewGroup.class.getDeclaredMethod("dispatchVisibilityChanged",View.class,int
-                        .class);
+                    .class);
+            dispatchVisibilityChanged.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
         }
