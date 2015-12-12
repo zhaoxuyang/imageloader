@@ -453,7 +453,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     private boolean mIsAttach;
 
-    private boolean mIsVisible;
+    private boolean mIsVisible = true;
 
     @Override
     public void onStartTemporaryDetach() {
