@@ -32,14 +32,9 @@ public class GifDecoder extends BaseDecoder{
         int bitmapWidth = decodeInfo.mGifOptions.outWidth;
         int bitmapHeight = decodeInfo.mGifOptions.outHeight;
         ImageLoaderLog.d(TAG, "gif width:" + bitmapWidth + ",height:" + bitmapHeight);
-        int sampleSize = 1;
-        if (decodeInfo.mScaleToFitView) {
-            while (bitmapWidth / 2 >= viewWidth || bitmapHeight / 2 >= viewHeight) { // ||
-                bitmapWidth /= 2;
-                bitmapHeight /= 2;
-                sampleSize *= 2;
-            }
-        }
+        int sampleSize = getSampleSize(decodeInfo, bitmapWidth, bitmapHeight, viewWidth, viewHeight);
+        bitmapWidth /= sampleSize;
+        bitmapHeight /= sampleSize;
         decodeInfo.mGifOptions.inJustDecodeBounds = false;
         decodeInfo.mGifOptions.inSampleSize = sampleSize;
         Gif gif = GifFactory.decodeFromByteArray(bytes, decodeInfo.mGifOptions);

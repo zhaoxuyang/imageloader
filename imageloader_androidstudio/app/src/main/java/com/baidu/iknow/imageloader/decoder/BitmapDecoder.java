@@ -17,12 +17,13 @@ import com.baidu.iknow.imageloader.request.ImageLoader;
 public class BitmapDecoder extends BaseDecoder {
 
     private static final String TAG = BitmapDecoder.class.getSimpleName();
-
+    
     @Override
     public boolean checkType(byte[] bytes) {
         return true;
     }
-
+    
+   
     @SuppressLint("NewApi")
     @Override
     public CustomDrawable doDecode(byte[] bytes, DecodeInfo decodeInfo, int viewWidth, int viewHeight) {
@@ -43,14 +44,9 @@ public class BitmapDecoder extends BaseDecoder {
         if (bitmapWidth <= 0 || bitmapHeight <= 0) {
             return null;
         }
-        int sampleSize = 1;
-        if (decodeInfo.mScaleToFitView && viewWidth>0 && viewHeight>0) {
-            while (bitmapWidth / 2 >= viewWidth || bitmapHeight / 2 >= viewHeight) {
-                bitmapWidth /= 2;
-                bitmapHeight /= 2;
-                sampleSize *= 2;
-            }
-        }
+        int sampleSize = getSampleSize(decodeInfo, bitmapWidth, bitmapHeight, viewWidth, viewHeight);
+        bitmapWidth /= sampleSize;
+        bitmapHeight /= sampleSize;
         ImageLoaderLog.d(TAG,threadId+" sampleSize:"+sampleSize);
         opts.inJustDecodeBounds = false;
         opts.inSampleSize = sampleSize;
