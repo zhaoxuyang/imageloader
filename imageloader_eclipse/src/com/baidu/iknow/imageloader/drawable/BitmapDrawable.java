@@ -82,7 +82,7 @@ public class BitmapDrawable extends CustomDrawable {
                 return mBitmap.getByteCount();
             }
         }catch(Exception e){
-            
+
         }
         return mBitmap.getRowBytes() * mBitmap.getHeight();
     }

@@ -1,6 +1,5 @@
 package com.baidu.iknow.imageloader.widgets;
 
-
 import com.baidu.iknow.imageloader.R;
 import com.baidu.iknow.imageloader.cache.ImageLoaderLog;
 import com.baidu.iknow.imageloader.cache.UrlSizeKey;
@@ -97,12 +96,12 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
      * @param attrs
      */
     private void init(AttributeSet attrs) {
-        if(mPendingScaleType==null){
+        if (mPendingScaleType == null) {
             mPendingScaleType = ScaleType.FIT_XY;
         }
         mBuilder = new CustomImageBuilder(this);
         mBuilder.setScaleType(mPendingScaleType);
-        try{
+        try {
             if (attrs != null) {
                 TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.CustomImageView);
 
@@ -113,7 +112,8 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
                 mBuilder.mBorderWidth = a.getDimensionPixelSize(R.styleable.CustomImageView_civ_borderWidth,
                         dipToPixel(getContext(), DEFAULT_BORDER_WIDTH));
                 mBuilder.mBorderColor = a.getColor(R.styleable.CustomImageView_civ_borderColor, DEFAULT_BORDER_COLOR);
-                mBuilder.mBorderSurroundContent = a.getBoolean(R.styleable.CustomImageView_civ_borderSurroundContent, true);
+                mBuilder.mBorderSurroundContent = a.getBoolean(R.styleable.CustomImageView_civ_borderSurroundContent,
+                        true);
                 mBuilder.mIsNight = a.getBoolean(R.styleable.CustomImageView_civ_isNight, false);
                 mBuilder.mAlpha = a.getFloat(R.styleable.CustomImageView_civ_alpha, 1.0f);
                 mBuilder.mDrawerType = a.getInt(R.styleable.CustomImageView_civ_drawerType, DrawerFactory.NORMAL);
@@ -138,15 +138,14 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             }
 
             mBuilder.mergeDrawArgs();
-            if(mPendingDrawable!=null){
+            if (mPendingDrawable != null) {
                 setImageDrawable(mPendingDrawable);
             }
 
-            mIsVisible = getVisibility()==View.VISIBLE;
-        }catch(Exception e){
+            mIsVisible = getVisibility() == View.VISIBLE;
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
 
     }
 
@@ -213,7 +212,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        stopLoad();
+        stopLoad(true);
         mDrawableWrapper.mViewWidth = w;
         mDrawableWrapper.mViewHeight = h;
         mNeedComputeBounds = true;
@@ -305,7 +304,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     public void setScaleType(ScaleType scaleType) {
-        if(mBuilder==null){
+        if (mBuilder == null) {
             mPendingScaleType = scaleType;
             return;
         }
@@ -318,7 +317,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     public ScaleType getScaleType() {
-        if(mBuilder==null){
+        if (mBuilder == null) {
             return super.getScaleType();
         }
         return mBuilder.mScaleType;
@@ -328,7 +327,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     public void setImageDrawable(Drawable drawable) {
-        if(mBuilder==null){
+        if (mBuilder == null) {
             mPendingDrawable = drawable;
             return;
         }
@@ -383,7 +382,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         }
         int vw = mDrawableWrapper.mViewWidth;
         int vh = mDrawableWrapper.mViewHeight;
-        if(mNeedResize){
+        if (mNeedResize) {
             vw = MeasureSpec.getSize(mWidthMeasureSpec);
             vh = MeasureSpec.getSize(mHeightMeasureSpec);
         }
@@ -401,9 +400,10 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         }
 
         mNeedComputeBounds = true;
-        stopLoad();
+        stopLoad(true);
         mUrl = url;
         startLoad();
+        requestLayout();
         return;
     }
 
@@ -416,34 +416,34 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     }
 
     private void startLoad() {
-        ImageLoaderLog.d(TAG,"mHasFrame:"+mHasFrame+",mIsAttach:"+mIsAttach+",mIsVisible:"+mIsVisible+",url:"+mUrl);
+        ImageLoaderLog.d(TAG,
+                "mHasFrame:" + mHasFrame + ",mIsAttach:" + mIsAttach + ",mIsVisible:" + mIsVisible + ",url:" + mUrl);
         if (!mHasFrame) {
             return;
         }
 
-        if(!mIsAttach || !mIsVisible){
+        if (!mIsAttach || !mIsVisible) {
             return;
         }
 
         int vw = mDrawableWrapper.mViewWidth;
         int vh = mDrawableWrapper.mViewHeight;
-        if(mNeedResize){
+        if (mNeedResize) {
             vw = MeasureSpec.getSize(mWidthMeasureSpec);
             vh = MeasureSpec.getSize(mHeightMeasureSpec);
         }
         ImageLoader.getInstance().load(mUrl, vw, vh, this, isFastScroll());
-        requestLayout();
         invalidate();
     }
 
-    private void stopLoad() {
+    private void stopLoad(boolean cancelRunning) {
         int vw = mDrawableWrapper.mViewWidth;
         int vh = mDrawableWrapper.mViewHeight;
-        if(mNeedResize){
+        if (mNeedResize) {
             vw = MeasureSpec.getSize(mWidthMeasureSpec);
             vh = MeasureSpec.getSize(mHeightMeasureSpec);
         }
-        ImageLoader.getInstance().cancelLoad(mUrl, vw, vh, this);
+        ImageLoader.getInstance().cancelLoad(mUrl, vw, vh, this, cancelRunning);
         if (mPlayer != null) {
             mPlayer.stop();
             mPlayer = null;
@@ -465,7 +465,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         if (mActivity != null) {
             mActivity.imageViews.remove(this);
         }
-        stopLoad();
+        stopLoad(false);
     }
 
     @Override
@@ -487,7 +487,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             return;
         }
         mIsAttach = true;
-        mIsVisible = getVisibility()==View.VISIBLE;
+        mIsVisible = getVisibility() == View.VISIBLE;
         super.onAttachedToWindow();
         if (mActivity != null) {
             mActivity.imageViews.add(this);
@@ -505,14 +505,14 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         if (mActivity != null) {
             mActivity.imageViews.remove(this);
         }
-        stopLoad();
+        stopLoad(true);
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
         super.onWindowFocusChanged(hasWindowFocus);
         if (!hasWindowFocus) {
-            stopLoad();
+            stopLoad(false);
         } else {
             startLoad();
         }
@@ -521,14 +521,14 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     @Override
     protected void onVisibilityChanged(View changedView, int visibility) {
         super.onVisibilityChanged(changedView, visibility);
-        if (visibility!=View.VISIBLE) {
-            if(!mIsVisible){
+        if (visibility != View.VISIBLE) {
+            if (!mIsVisible) {
                 return;
             }
             mIsVisible = false;
-            stopLoad();
+            stopLoad(false);
         } else {
-            if(mIsVisible){
+            if (mIsVisible) {
                 return;
             }
             mIsVisible = true;
@@ -539,14 +539,14 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     @Override
     public void setVisibility(int visibility) {
         super.setVisibility(visibility);
-        if (visibility!=View.VISIBLE) {
-            if(!mIsVisible){
+        if (visibility != View.VISIBLE) {
+            if (!mIsVisible) {
                 return;
             }
             mIsVisible = false;
-            stopLoad();
+            stopLoad(false);
         } else {
-            if(mIsVisible){
+            if (mIsVisible) {
                 return;
             }
             mIsVisible = true;
@@ -589,7 +589,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         }
         int vw = mDrawableWrapper.mViewWidth;
         int vh = mDrawableWrapper.mViewHeight;
-        if(mNeedResize){
+        if (mNeedResize) {
             vw = MeasureSpec.getSize(mWidthMeasureSpec);
             vh = MeasureSpec.getSize(mHeightMeasureSpec);
         }
@@ -611,7 +611,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         }
         int vw = mDrawableWrapper.mViewWidth;
         int vh = mDrawableWrapper.mViewHeight;
-        if(mNeedResize){
+        if (mNeedResize) {
             vw = MeasureSpec.getSize(mWidthMeasureSpec);
             vh = MeasureSpec.getSize(mHeightMeasureSpec);
         }
@@ -642,7 +642,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         }
         int vw = mDrawableWrapper.mViewWidth;
         int vh = mDrawableWrapper.mViewHeight;
-        if(mNeedResize){
+        if (mNeedResize) {
             vw = MeasureSpec.getSize(mWidthMeasureSpec);
             vh = MeasureSpec.getSize(mHeightMeasureSpec);
         }
@@ -656,10 +656,9 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     }
 
-    public CustomImageBuilder getBuilder(){
+    public CustomImageBuilder getBuilder() {
         return mBuilder;
     }
-
 
     public static class CustomImageBuilder {
 

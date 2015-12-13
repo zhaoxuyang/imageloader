@@ -21,7 +21,7 @@ public class CustomFragment extends Fragment{
     static {
         try {
             dispatchVisibilityChanged = ViewGroup.class.getDeclaredMethod("dispatchVisibilityChanged",View.class,int
-                        .class);
+                    .class);
             dispatchVisibilityChanged.setAccessible(true);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();

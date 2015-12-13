@@ -118,10 +118,6 @@ public class ImageLoader {
             ImageLoadTask task = mTasks.remove(key);
             mRunningQuene.remove(task);
             HashSet<ImageLoadingListener> listenersSet = mListeners.remove(key);
-            if (task == null) {
-                runNext();
-                return;
-            }
             if (drawable.checkLegal()) {
                 if (!fromMemmoryCache) {
                     mMemmoryCache.put(UrlSizeKey.obtain(key), drawable);
@@ -156,7 +152,6 @@ public class ImageLoader {
         public void onLoadingCancelled(UrlSizeKey key) {
             ImageLoadTask task = mTasks.remove(key);
             mRunningQuene.remove(task);
-            mWaitingQuene.remove(task);
             HashSet<ImageLoadingListener> listenersSet = mListeners.remove(key);
             if (listenersSet != null) {
                 Iterator<ImageLoadingListener> iter = listenersSet.iterator();
@@ -273,7 +268,7 @@ public class ImageLoader {
         }
     }
 
-    public void cancelLoad(String url, int width, int height, ImageLoadingListener listener) {
+    public void cancelLoad(String url, int width, int height, ImageLoadingListener listener, boolean cancelRunning) {
         if (TextUtils.isEmpty(url)) {
             return;
         }
@@ -291,6 +286,8 @@ public class ImageLoader {
                     mTasks.remove(key);
                     mListeners.remove(key);
                 }
+            } else if (cancelRunning) {
+                task.cancel(false);
             }
 
         }
