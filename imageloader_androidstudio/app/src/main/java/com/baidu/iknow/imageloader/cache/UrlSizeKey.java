@@ -1,10 +1,17 @@
 package com.baidu.iknow.imageloader.cache;
 
+
 import android.support.v4.util.Pools;
 import android.support.v4.util.Pools.Pool;
 import android.text.TextUtils;
 
 public class UrlSizeKey {
+
+    public static final int TYPE_LOADIMAGE = 1;
+
+    public static final int TYPE_LOADSIZE = 2;
+
+    public static final int TYPE_LOADFILE = 3;
 
     private static final int MAX_POOL_SIZE = 40;
 
@@ -15,6 +22,8 @@ public class UrlSizeKey {
     public int mViewWidth;
 
     public int mViewHeight;
+
+    public int mType = TYPE_LOADIMAGE;
 
     @Override
     public boolean equals(Object o) {
@@ -31,6 +40,7 @@ public class UrlSizeKey {
 
         same = same && (mViewWidth == key.mViewWidth);
         same = same && (mViewHeight == key.mViewHeight);
+        same = same && (mType == key.mType);
         return same;
     }
 
@@ -57,6 +67,7 @@ public class UrlSizeKey {
             instance.mUrl = key.mUrl;
             instance.mViewHeight = key.mViewHeight;
             instance.mViewWidth = key.mViewWidth;
+            instance.mType = key.mType;
         }
         return instance;
     }
@@ -66,6 +77,7 @@ public class UrlSizeKey {
         mUrl = null;
         mViewWidth = 0;
         mViewHeight = 0;
+        mType = TYPE_LOADIMAGE;
     }
 
 }

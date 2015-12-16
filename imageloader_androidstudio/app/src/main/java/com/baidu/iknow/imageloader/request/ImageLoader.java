@@ -11,12 +11,16 @@ import com.baidu.iknow.imageloader.cache.BitmapPool;
 import com.baidu.iknow.imageloader.cache.ByteArrayPool;
 import com.baidu.iknow.imageloader.cache.DiskCache;
 import com.baidu.iknow.imageloader.cache.ExternalCacheDiskCacheFactory;
+import com.baidu.iknow.imageloader.cache.FileLruCache;
 import com.baidu.iknow.imageloader.cache.ImageLoaderLog;
 import com.baidu.iknow.imageloader.cache.InternalCacheDiskCacheFactory;
 import com.baidu.iknow.imageloader.cache.MemmoryLruCache;
 import com.baidu.iknow.imageloader.cache.MemorySizeCalculator;
+import com.baidu.iknow.imageloader.cache.SizeLruCache;
 import com.baidu.iknow.imageloader.cache.UrlSizeKey;
 import com.baidu.iknow.imageloader.drawable.CustomDrawable;
+import com.baidu.iknow.imageloader.drawable.FileDrawable;
+import com.baidu.iknow.imageloader.drawable.SizeDrawable;
 
 import android.content.Context;
 import android.os.Environment;
@@ -82,20 +86,14 @@ public class ImageLoader {
             ImageLoadTask task = mTasks.remove(key);
             mRunningQuene.remove(task);
             HashSet<ImageLoadingListener> listenersSet = mListeners.remove(key);
-            if (task == null) {
-                runNext();
-                return;
-            }
             if (task.retryCount < ImageLoadTask.RETYR_MAX_COUNT) {
                 ImageLoaderLog.d(TAG,
                         "failed retry URL:" + key.mUrl + ",width:" + key.mViewWidth + ",height:" + key.mViewHeight);
                 task.retryCount++;
-                UrlSizeKey newkey = UrlSizeKey.obtain(key);
                 ImageLoadTask newtask = new ImageLoadTask(task);
-                newtask.mKey = newkey;
-                mTasks.put(newkey, newtask);
+                mTasks.put(newtask.mKey, newtask);
                 mWaitingQuene.add(newtask);
-                mListeners.put(newkey, listenersSet);
+                mListeners.put(newtask.mKey, listenersSet);
             } else {
                 if (listenersSet != null) {
                     Iterator<ImageLoadingListener> iter = listenersSet.iterator();
@@ -137,12 +135,10 @@ public class ImageLoader {
                 ImageLoaderLog.d(TAG,
                         "complete retry URL:" + key.mUrl + ",width:" + key.mViewWidth + ",height:" + key.mViewHeight);
                 task.retryCount++;
-                UrlSizeKey newkey = UrlSizeKey.obtain(key);
                 ImageLoadTask newtask = new ImageLoadTask(task);
-                newtask.mKey = newkey;
-                mTasks.put(newkey, newtask);
+                mTasks.put(newtask.mKey, newtask);
                 mWaitingQuene.add(newtask);
-                mListeners.put(newkey, listenersSet);
+                mListeners.put(newtask.mKey, listenersSet);
             }
 
             runNext();
@@ -164,7 +160,130 @@ public class ImageLoader {
             }
             runNext();
         }
+
     };
+
+    private SizeLruCache mSizeLruCache;
+
+    private ConcurrentHashMap<UrlSizeKey, HashSet<ImageSizeListener>> mSizeListeners =
+            new ConcurrentHashMap<UrlSizeKey, HashSet<ImageSizeListener>>();
+
+    private ImageSizeListener mEmptySizeListener = new SimpleImageSizeListener();
+
+    private ImageSizeListener mDispatchImageSizeListener = new ImageSizeListener() {
+
+        @Override
+        public void onGetSizeStart(UrlSizeKey key) {
+            HashSet<ImageSizeListener> listenersSet = mSizeListeners.get(key);
+            if (listenersSet != null) {
+                Iterator<ImageSizeListener> iter = listenersSet.iterator();
+                while (iter.hasNext()) {
+                    ImageSizeListener listener = iter.next();
+                    if (listener != null) {
+                        listener.onGetSizeStart(key);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onGetSizeFailed(UrlSizeKey key, Exception failReason) {
+            ImageLoadTask task = mTasks.remove(key);
+            mRunningQuene.remove(task);
+            HashSet<ImageSizeListener> listenersSet = mSizeListeners.remove(key);
+            if (listenersSet != null) {
+                Iterator<ImageSizeListener> iter = listenersSet.iterator();
+                while (iter.hasNext()) {
+                    ImageSizeListener listener = iter.next();
+                    if (listener != null) {
+                        listener.onGetSizeFailed(key, failReason);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onGetSizeComplete(UrlSizeKey key, SizeDrawable drawable, boolean fromMemmoryCache) {
+            ImageLoaderLog.d(TAG,
+                    "completesize URL:" + key.mUrl + ",width:" + drawable.getIntrinsicWidth()+ ",height:" + drawable
+                            .getIntrinsicHeight());
+            if(!fromMemmoryCache){
+                mSizeLruCache.put(UrlSizeKey.obtain(key),drawable);
+            }
+            ImageLoadTask task = mTasks.remove(key);
+            mRunningQuene.remove(task);
+            HashSet<ImageSizeListener> listenersSet = mSizeListeners.remove(key);
+            if (listenersSet != null) {
+                Iterator<ImageSizeListener> iter = listenersSet.iterator();
+                while (iter.hasNext()) {
+                    ImageSizeListener listener = iter.next();
+                    if (listener != null) {
+                        listener.onGetSizeComplete(key, drawable, fromMemmoryCache);
+                    }
+                }
+            }
+        }
+    };
+
+    private FileLruCache mFileLruCache;
+
+    private ConcurrentHashMap<UrlSizeKey, HashSet<ImageFileListener>> mFileListeners =
+            new ConcurrentHashMap<UrlSizeKey, HashSet<ImageFileListener>>();
+
+    private ImageFileListener mEmptyFileListener = new SimpleImageFileListener();
+
+    private ImageFileListener mDispatchImageFileListener = new ImageFileListener() {
+
+        @Override
+        public void onGetFileStart(UrlSizeKey key) {
+            HashSet<ImageFileListener> listenersSet = mFileListeners.get(key);
+            if (listenersSet != null) {
+                Iterator<ImageFileListener> iter = listenersSet.iterator();
+                while (iter.hasNext()) {
+                    ImageFileListener listener = iter.next();
+                    if (listener != null) {
+                        listener.onGetFileStart(key);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onGetFileFailed(UrlSizeKey key, Exception failReason) {
+            ImageLoadTask task = mTasks.remove(key);
+            mRunningQuene.remove(task);
+            HashSet<ImageFileListener> listenersSet = mFileListeners.remove(key);
+            if (listenersSet != null) {
+                Iterator<ImageFileListener> iter = listenersSet.iterator();
+                while (iter.hasNext()) {
+                    ImageFileListener listener = iter.next();
+                    if (listener != null) {
+                        listener.onGetFileFailed(key,failReason);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onGetFileComplete(UrlSizeKey key, FileDrawable drawable, boolean fromMemmoryCache) {
+            if(!fromMemmoryCache){
+                mFileLruCache.put(UrlSizeKey.obtain(key),drawable);
+            }
+            ImageLoadTask task = mTasks.remove(key);
+            mRunningQuene.remove(task);
+            HashSet<ImageFileListener> listenersSet = mFileListeners.remove(key);
+            if (listenersSet != null) {
+                Iterator<ImageFileListener> iter = listenersSet.iterator();
+                while (iter.hasNext()) {
+                    ImageFileListener listener = iter.next();
+                    if (listener != null) {
+                        listener.onGetFileComplete(key, drawable, fromMemmoryCache);
+                    }
+                }
+            }
+        }
+    };
+
 
     private ImageLoader() {
     }
@@ -182,6 +301,8 @@ public class ImageLoader {
         mBitmapPool = new BitmapPool(memorySizeCalator.getBitmapPoolSize(), "bitmap");
         mMemmoryCache = new MemmoryLruCache(memorySizeCalator.getMemoryCacheSize());
         mByteArrayPool = new ByteArrayPool(memorySizeCalator.getArrayPoolSizeInBytes());
+        mSizeLruCache = new SizeLruCache(100);
+        mFileLruCache = new FileLruCache(100);
         boolean hasExtrenalStorage = true;
         try {
             String state = Environment.getExternalStorageState();
@@ -207,22 +328,30 @@ public class ImageLoader {
         if (mDiskLruCache == null) {
             mDiskLruCache = new InternalCacheDiskCacheFactory(context).build();
         }
+
+        CustomDrawable.sTargetDensity = context.getResources().getDisplayMetrics().densityDpi;
     }
 
-    public void load(String url, int width, int height, ImageLoadingListener listener,
-                     boolean isFastScroll) {
+    public void clear(){
+        ImageLoaderLog.d(TAG,"clear");
+        mMemmoryCache.trimToSize(0);
+        mBitmapPool.trimToSize(0);
+        mGifBitmapPool.trimToSize(0);
+    }
 
-        ImageLoaderLog.d(TAG, "startload URL:" + url + ",width:" + width + ",height:" + height);
 
-        if (listener == null) {
-            listener = mEmptyListener;
-        }
+    public void loadImage(String url, int width, int height, ImageLoadingListener listener,
+                          boolean isFastScroll) {
 
         if (TextUtils.isEmpty(url)) {
             return;
         }
 
-        UrlSizeKey key = obtain(url, width, height);
+        if (listener == null) {
+            listener = mEmptyListener;
+        }
+
+        UrlSizeKey key = obtain(url, width, height, UrlSizeKey.TYPE_LOADIMAGE);
 
         CustomDrawable drawable = mMemmoryCache.get(key);
         if (drawable != null) {
@@ -238,25 +367,100 @@ public class ImageLoader {
             return;
         }
 
-        if (mTasks.containsKey(key)) {
-            if (mListeners.containsKey(key)) {
-                HashSet<ImageLoadingListener> listeners = mListeners.get(key);
-                listeners.add(listener);
-            }
+        ImageLoadTask task = mTasks.get(key);
+        if (task != null && mListeners.containsKey(key)) {
+            HashSet<ImageLoadingListener> listeners = mListeners.get(key);
+            listeners.add(listener);
             release(key);
             return;
         }
 
         ImageLoaderLog.d(TAG, "real startload URL:" + url + ",width:" + width + ",height:" + height);
 
-        ImageLoadTask task = new ImageLoadTask();
+        task = new ImageLoadTask();
         task.mImageLoadingListener = mDispatchListener;
         task.mKey = key;
-        mTasks.put(key, task);
-        mWaitingQuene.offer(task);
         HashSet<ImageLoadingListener> listeners = new HashSet<ImageLoadingListener>();
         listeners.add(listener);
+        mTasks.put(key, task);
+        mWaitingQuene.offer(task);
         mListeners.put(key, listeners);
+        runNext();
+    }
+
+    public void loadImageOnlyGetSize(String url, ImageSizeListener listener) {
+        if (TextUtils.isEmpty(url)) {
+            return;
+        }
+
+        if (listener == null) {
+            listener = mEmptySizeListener;
+        }
+
+        UrlSizeKey key = obtain(url, 0, 0, UrlSizeKey.TYPE_LOADSIZE);
+
+        SizeDrawable drawable = mSizeLruCache.get(key);
+        if (drawable != null) {
+            listener.onGetSizeStart(key);
+            listener.onGetSizeComplete(key, drawable, true);
+            release(key);
+            return;
+        }
+
+        ImageLoadTask task = mTasks.get(key);
+        if (task != null && mSizeListeners.containsKey(key)) {
+            HashSet<ImageSizeListener> listeners = mSizeListeners.get(key);
+            listeners.add(listener);
+            release(key);
+            return;
+        }
+
+        task = new ImageLoadTask();
+        task.mImageSizeListener = mDispatchImageSizeListener;
+        task.mKey = key;
+        HashSet<ImageSizeListener> listeners = new HashSet<ImageSizeListener>();
+        listeners.add(listener);
+        mTasks.put(key, task);
+        mWaitingQuene.offer(task);
+        mSizeListeners.put(key, listeners);
+        runNext();
+    }
+
+    public void loadImageOnlyGetFile(String url, ImageFileListener listener) {
+        if (TextUtils.isEmpty(url)) {
+            return;
+        }
+
+        if (listener == null) {
+            listener = mEmptyFileListener;
+        }
+
+        UrlSizeKey key = obtain(url, 0, 0, UrlSizeKey.TYPE_LOADFILE);
+
+        FileDrawable drawable = mFileLruCache.get(key);
+        if (drawable != null) {
+            listener.onGetFileStart(key);
+            listener.onGetFileComplete(key, drawable, true);
+            release(key);
+            return;
+        }
+
+        ImageLoadTask task = mTasks.get(key);
+        if (task != null && mFileListeners.containsKey(key)) {
+            HashSet<ImageFileListener> listeners = mFileListeners.get(key);
+            listeners.add(listener);
+            release(key);
+            return;
+        }
+
+        task = new ImageLoadTask();
+        task.mImageFileListener = mDispatchImageFileListener;
+        task.mKey = key;
+        HashSet<ImageFileListener> listeners = new HashSet<ImageFileListener>();
+        listeners.add(listener);
+        mTasks.put(key, task);
+        mWaitingQuene.offer(task);
+        mFileListeners.put(key, listeners);
         runNext();
     }
 
@@ -273,7 +477,7 @@ public class ImageLoader {
             return;
         }
         mFailedQuene.remove(url);
-        UrlSizeKey key = obtain(url, width, height);
+        UrlSizeKey key = obtain(url, width, height, UrlSizeKey.TYPE_LOADIMAGE);
         if (mTasks.containsKey(key)) {
             ImageLoaderLog.d(TAG, "cancel waiting URL:" + url + ",width:" + width + ",height:" + height);
             ImageLoadTask task = mTasks.get(key);
@@ -296,17 +500,18 @@ public class ImageLoader {
     }
 
     public CustomDrawable getMemmory(String url, int width, int height) {
-        UrlSizeKey key = obtain(url, width, height);
+        UrlSizeKey key = obtain(url, width, height, UrlSizeKey.TYPE_LOADIMAGE);
         CustomDrawable drawable = mMemmoryCache.get(key);
         key.recycle();
         return drawable;
     }
 
-    private UrlSizeKey obtain(String url, int width, int height) {
+    private UrlSizeKey obtain(String url, int width, int height, int type) {
         UrlSizeKey key = UrlSizeKey.obtain();
         key.mUrl = url;
         key.mViewWidth = width;
         key.mViewHeight = height;
+        key.mType = type;
         return key;
     }
 

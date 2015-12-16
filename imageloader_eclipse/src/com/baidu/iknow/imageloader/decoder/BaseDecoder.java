@@ -3,6 +3,7 @@ package com.baidu.iknow.imageloader.decoder;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.baidu.iknow.imageloader.drawable.CustomDrawable;
+import com.baidu.iknow.imageloader.drawable.SizeDrawable;
 
 import android.opengl.GLES10;
 
@@ -23,6 +24,8 @@ public abstract class BaseDecoder {
     public abstract boolean checkType(byte[] bytes);
 
     public abstract CustomDrawable doDecode(byte[] bytes, DecodeInfo decodeInfo, int viewWidth, int viewHeight);
+
+    public abstract SizeDrawable getSize(byte[] bytes, DecodeInfo decodeInfo);
 
     private float getMaxRatio(int bitmapWidth, int bitmapHeight, int viewWidth, int viewHeight) {
         if (viewWidth <= 0 || viewHeight <= 0) {

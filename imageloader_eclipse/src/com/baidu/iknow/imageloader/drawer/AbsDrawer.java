@@ -12,7 +12,6 @@ import android.graphics.PointF;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.RectF;
-import android.util.Log;
 import android.widget.ImageView.ScaleType;
 
 
@@ -223,7 +222,6 @@ public abstract class AbsDrawer {
 
 		updatePaint();
 
-		int save1 = canvas.save();
 		final int scrollX = drawable.mScrollX;
 		final int scrollY = drawable.mScrollY;
 		final int pLeft = drawable.mPaddingLeft;
@@ -239,13 +237,9 @@ public abstract class AbsDrawer {
 			canvas.concat(mArgs.mExtraMatrix);
 		}
 
-		int save2 = canvas.save();
 		drawContentReal(canvas, drawable);
-		canvas.restoreToCount(save2);
-	
-		drawBorder(canvas, drawable);
 
-		canvas.restoreToCount(save1);
+		drawBorder(canvas, drawable);
 
 	}
 

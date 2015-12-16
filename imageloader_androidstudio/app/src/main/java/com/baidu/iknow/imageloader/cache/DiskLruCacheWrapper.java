@@ -50,6 +50,7 @@ public class DiskLruCacheWrapper implements DiskCache {
         return diskLruCache;
     }
 
+
     @Override
     public DiskLruCache.Snapshot get(String key) {
         String safeKey = safeKeyGenerator.getSafeKey(key);
@@ -126,6 +127,16 @@ public class DiskLruCacheWrapper implements DiskCache {
                 ImageLoaderLog.w(TAG, "Unable to delete from disk cache", e);
             }
         }
+    }
+
+    @Override
+    public File getFile(String key,int i) {
+        String safeKey = safeKeyGenerator.getSafeKey(key);
+        File file = new File(directory, safeKey + "." + i);
+        if(file.exists()){
+            return file;
+        }
+        return null;
     }
 
     @Override

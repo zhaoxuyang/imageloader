@@ -675,7 +675,7 @@ public final class DiskLruCache implements Closeable {
 
   /** A snapshot of the values for an entry. */
   public final class Snapshot implements Closeable {
-    private final String key;
+    public final String key;
     private final long sequenceNumber;
     private final InputStream[] ins;
     private final long[] lengths;

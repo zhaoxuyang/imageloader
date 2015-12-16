@@ -5,13 +5,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.os.Build;
-import android.util.Log;
 
 import com.baidu.iknow.imageloader.bitmap.BitmapLock;
 import com.baidu.iknow.imageloader.cache.ImageLoaderLog;
 import com.baidu.iknow.imageloader.drawable.BitmapDrawable;
 import com.baidu.iknow.imageloader.drawable.CustomDrawable;
 import com.baidu.iknow.imageloader.drawable.BitmapDrawable.BitmapDrawableFactory;
+import com.baidu.iknow.imageloader.drawable.SizeDrawable;
 import com.baidu.iknow.imageloader.request.ImageLoader;
 
 public class BitmapDecoder extends BaseDecoder {
@@ -22,8 +22,8 @@ public class BitmapDecoder extends BaseDecoder {
     public boolean checkType(byte[] bytes) {
         return true;
     }
-    
-   
+
+
     @SuppressLint("NewApi")
     @Override
     public CustomDrawable doDecode(byte[] bytes, DecodeInfo decodeInfo, int viewWidth, int viewHeight) {
@@ -72,6 +72,22 @@ public class BitmapDecoder extends BaseDecoder {
         }
         BitmapDrawable bd = BitmapDrawableFactory.createBitmapDrawable(bm);
         return bd;
+    }
+
+    @Override
+    public SizeDrawable getSize(byte[] bytes, DecodeInfo decodeInfo) {
+        Options opts = decodeInfo.mBitmapOptions;
+        opts.inJustDecodeBounds = true;
+        opts.inSampleSize = 1;
+        opts.outWidth = -1;
+        opts.outHeight = -1;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            opts.inBitmap = null;
+        }
+        BitmapFactory.decodeByteArray(bytes, 0, bytes.length, opts);
+        int bitmapWidth = opts.outWidth;
+        int bitmapHeight = opts.outHeight;
+        return new SizeDrawable(bitmapWidth,bitmapHeight);
     }
 
 }

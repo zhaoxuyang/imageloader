@@ -1,7 +1,6 @@
 package com.baidu.iknow.imageloader.widgets;
 
 import com.baidu.iknow.imageloader.R;
-import com.baidu.iknow.imageloader.cache.ImageLoaderLog;
 import com.baidu.iknow.imageloader.cache.UrlSizeKey;
 import com.baidu.iknow.imageloader.drawable.BitmapDrawable;
 import com.baidu.iknow.imageloader.drawable.BitmapDrawable.BitmapDrawableFactory;
@@ -22,10 +21,10 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Path;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
@@ -76,6 +75,16 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     private CustomImageBuilder mBuilder;
 
+    private ImageLoadingListener mListener;
+
+    private boolean mAdjustViewBounds = false;
+
+    private int mMaxWidth = Integer.MAX_VALUE;
+
+    private int mMaxHeight = Integer.MAX_VALUE;
+
+    private boolean mAdjustViewBoundsCompat = false;
+
     public CustomImageView(Context context) {
         super(context);
         init(null);
@@ -108,12 +117,10 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
                 mBuilder.mRadius = a.getDimensionPixelSize(R.styleable.CustomImageView_civ_radius,
                         dipToPixel(getContext(), DEFAULT_RADIUS));
 
-                mBuilder.mHasBorder = a.getBoolean(R.styleable.CustomImageView_civ_hasBorder, true);
+                mBuilder.mHasBorder = a.getBoolean(R.styleable.CustomImageView_civ_hasBorder, false);
                 mBuilder.mBorderWidth = a.getDimensionPixelSize(R.styleable.CustomImageView_civ_borderWidth,
                         dipToPixel(getContext(), DEFAULT_BORDER_WIDTH));
                 mBuilder.mBorderColor = a.getColor(R.styleable.CustomImageView_civ_borderColor, DEFAULT_BORDER_COLOR);
-                mBuilder.mBorderSurroundContent = a.getBoolean(R.styleable.CustomImageView_civ_borderSurroundContent,
-                        true);
                 mBuilder.mIsNight = a.getBoolean(R.styleable.CustomImageView_civ_isNight, false);
                 mBuilder.mAlpha = a.getFloat(R.styleable.CustomImageView_civ_alpha, 1.0f);
                 mBuilder.mDrawerType = a.getInt(R.styleable.CustomImageView_civ_drawerType, DrawerFactory.NORMAL);
@@ -143,6 +150,8 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             }
 
             mIsVisible = getVisibility() == View.VISIBLE;
+            mAdjustViewBoundsCompat = getContext().getApplicationInfo().targetSdkVersion <=
+                    Build.VERSION_CODES.JELLY_BEAN_MR1;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -156,12 +165,18 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         int w;
         int h;
 
+        float desiredAspect = 0.0f;
+
         boolean resizeWidth = false;
         boolean resizeHeight = false;
+        mWidthMeasureSpec = widthMeasureSpec;
+        mHeightMeasureSpec = heightMeasureSpec;
+        int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
+        int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
+        mNeedResize = (widthSpecMode != MeasureSpec.EXACTLY) || (heightSpecMode != MeasureSpec.EXACTLY);
         Drawable drawable = getDrawable();
 
         if (drawable == null) {
-
             w = h = 0;
         } else {
             w = drawable.getIntrinsicWidth();
@@ -171,6 +186,11 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             }
             if (h <= 0) {
                 h = 1;
+            }
+            if (mAdjustViewBounds) {
+                resizeWidth = (widthSpecMode != MeasureSpec.EXACTLY);
+                resizeHeight = (heightSpecMode != MeasureSpec.EXACTLY);
+                desiredAspect = (float) w / (float) h;
             }
 
         }
@@ -183,24 +203,80 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         int widthSize;
         int heightSize;
 
-        mWidthMeasureSpec = widthMeasureSpec;
-        mHeightMeasureSpec = heightMeasureSpec;
-        int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
-        int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
-        resizeWidth = widthSpecMode != MeasureSpec.EXACTLY;
-        resizeHeight = heightSpecMode != MeasureSpec.EXACTLY;
-        mNeedResize = resizeWidth || resizeHeight;
+        if (resizeWidth || resizeHeight) {
 
-        w += pleft + pright;
-        h += ptop + pbottom;
+            widthSize = resolveAdjustedSize(w + pleft + pright, mMaxWidth, widthMeasureSpec);
 
-        w = Math.max(w, getSuggestedMinimumWidth());
-        h = Math.max(h, getSuggestedMinimumHeight());
+            heightSize = resolveAdjustedSize(h + ptop + pbottom, mMaxHeight, heightMeasureSpec);
 
-        widthSize = resolveSize(w, widthMeasureSpec);
-        heightSize = resolveSize(h, heightMeasureSpec);
+            if (desiredAspect != 0.0f) {
+                float actualAspect = (float)(widthSize - pleft - pright) /
+                        (heightSize - ptop - pbottom);
+
+                if (Math.abs(actualAspect - desiredAspect) > 0.0000001) {
+
+                    boolean done = false;
+
+                    if (resizeWidth) {
+                        int newWidth = (int)(desiredAspect * (heightSize - ptop - pbottom)) +
+                                pleft + pright;
+
+                        if (!resizeHeight && !mAdjustViewBoundsCompat) {
+                            widthSize = resolveAdjustedSize(newWidth, mMaxWidth, widthMeasureSpec);
+                        }
+
+                        if (newWidth <= widthSize) {
+                            widthSize = newWidth;
+                            done = true;
+                        }
+                    }
+
+                    if (!done && resizeHeight) {
+                        int newHeight = (int)((widthSize - pleft - pright) / desiredAspect) +
+                                ptop + pbottom;
+
+                        if (!resizeWidth && !mAdjustViewBoundsCompat) {
+                            heightSize = resolveAdjustedSize(newHeight, mMaxHeight,
+                                    heightMeasureSpec);
+                        }
+
+                        if (newHeight <= heightSize) {
+                            heightSize = newHeight;
+                        }
+                    }
+                }
+            }
+        } else {
+            w += pleft + pright;
+            h += ptop + pbottom;
+
+            w = Math.max(w, getSuggestedMinimumWidth());
+            h = Math.max(h, getSuggestedMinimumHeight());
+
+            widthSize = resolveSizeAndState(w, widthMeasureSpec, 0);
+            heightSize = resolveSizeAndState(h, heightMeasureSpec, 0);
+        }
 
         setMeasuredDimension(widthSize, heightSize);
+    }
+
+    private int resolveAdjustedSize(int desiredSize, int maxSize,
+                                    int measureSpec) {
+        int result = desiredSize;
+        int specMode = MeasureSpec.getMode(measureSpec);
+        int specSize =  MeasureSpec.getSize(measureSpec);
+        switch (specMode) {
+            case MeasureSpec.UNSPECIFIED:
+                result = Math.min(desiredSize, maxSize);
+                break;
+            case MeasureSpec.AT_MOST:
+                result = Math.min(Math.min(desiredSize, specSize), maxSize);
+                break;
+            case MeasureSpec.EXACTLY:
+                result = specSize;
+                break;
+        }
+        return result;
     }
 
     @Override
@@ -229,6 +305,8 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         mDrawableWrapper.mPaddingRight = right;
         mDrawableWrapper.mPaddingTop = top;
         mDrawableWrapper.mPaddingBottom = bottom;
+        mNeedComputeBounds = true;
+        invalidate();
     }
 
     @Override
@@ -239,25 +317,43 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         }
         mDrawableWrapper.mScrollX = x;
         mDrawableWrapper.mScrollY = y;
+        mNeedComputeBounds = true;
+        invalidate();
     }
 
-    @Override
-    public void requestLayout() {
-        ViewGroup.LayoutParams lp = getLayoutParams();
-        if (lp != null && lp.width > 0 && lp.height > 0 && !mNeedResize) {
-            if (getWidth() == lp.width && getHeight() == lp.height) {
-                return;
-            }
-        }
-        super.requestLayout();
-    }
 
     @Override
     protected void onDraw(Canvas canvas) {
         // long startTime = System.currentTimeMillis();
-        drawBackground(canvas);
+        super.onDraw(canvas);
         drawContent(canvas);
         // Log.d(TAG, (System.currentTimeMillis() - startTime) + "");
+    }
+
+    @Override
+    public void setMaxWidth(int maxWidth) {
+        super.setMaxWidth(maxWidth);
+        mMaxWidth = maxWidth;
+    }
+
+    public int getMaxWidth() {
+        return mMaxWidth;
+    }
+
+    @Override
+    public void setMaxHeight(int maxHeight) {
+        super.setMaxHeight(maxHeight);
+        mMaxHeight = maxHeight;
+    }
+
+    public int getMaxHeight() {
+        return mMaxHeight;
+    }
+
+    @Override
+    public void setAdjustViewBounds(boolean adjustViewBounds) {
+        super.setAdjustViewBounds(adjustViewBounds);
+        mAdjustViewBounds = adjustViewBounds;
     }
 
     /**
@@ -277,28 +373,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         mNeedComputeBounds = false;
     }
 
-    /**
-     * 绘制背景
-     *
-     * @param canvas
-     */
-    private void drawBackground(Canvas canvas) {
-        final Drawable background = getBackground();
-        if (background != null) {
-            final int scrollX = mDrawableWrapper.mScrollX;
-            final int scrollY = mDrawableWrapper.mScrollY;
 
-            background.setBounds(0, 0, mDrawableWrapper.mViewWidth, mDrawableWrapper.mViewHeight);
-
-            if ((scrollX | scrollY) == 0) {
-                background.draw(canvas);
-            } else {
-                canvas.translate(scrollX, scrollY);
-                background.draw(canvas);
-                canvas.translate(-scrollX, -scrollY);
-            }
-        }
-    }
 
     private ScaleType mPendingScaleType;
 
@@ -358,35 +433,36 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         if (mPlayer != null) {
             drawable = mPlayer.play(drawable, isFastScroll());
         }
+
         if (drawable != null) {
             mDrawableWrapper.mDrawable = drawable;
             mDrawableWrapper.mScaleType = mBuilder.mScaleType;
             mDrawableWrapper.mDrawer = mDrawer;
-        } else if (ImageLoader.getInstance().mFailedQuene.contains(mUrl)) {
-            mDrawableWrapper.mDrawable = mBuilder.mErrorDrawable;
-            mDrawableWrapper.mScaleType = mBuilder.mErrorScaleType;
-            mDrawableWrapper.mDrawer = mErrorDrawer;
-            drawable = mBuilder.mErrorDrawable;
         } else {
-            mDrawableWrapper.mDrawable = mBuilder.mBlankDrawable;
-            mDrawableWrapper.mScaleType = mBuilder.mBlankScaleType;
-            mDrawableWrapper.mDrawer = mBlankDrawer;
-            drawable = mBuilder.mBlankDrawable;
+            if (!mIsLoad) {
+                startLoad();
+            }
+            if (ImageLoader.getInstance().mFailedQuene.contains(mUrl)) {
+                mDrawableWrapper.mDrawable = mBuilder.mErrorDrawable;
+                mDrawableWrapper.mScaleType = mBuilder.mErrorScaleType;
+                mDrawableWrapper.mDrawer = mErrorDrawer;
+                drawable = mBuilder.mErrorDrawable;
+            } else {
+                mDrawableWrapper.mDrawable = mBuilder.mBlankDrawable;
+                mDrawableWrapper.mScaleType = mBuilder.mBlankScaleType;
+                mDrawableWrapper.mDrawer = mBlankDrawer;
+                drawable = mBuilder.mBlankDrawable;
+            }
         }
         return drawable;
     }
 
     public Drawable getDrawableFromCache() {
-        if (!mHasFrame || TextUtils.isEmpty(mUrl)) {
+        if (TextUtils.isEmpty(mUrl)) {
             return null;
         }
-        int vw = mDrawableWrapper.mViewWidth;
-        int vh = mDrawableWrapper.mViewHeight;
-        if (mNeedResize) {
-            vw = MeasureSpec.getSize(mWidthMeasureSpec);
-            vh = MeasureSpec.getSize(mHeightMeasureSpec);
-        }
-        CustomDrawable drawable = ImageLoader.getInstance().getMemmory(mUrl, vw, vh);
+        int[] res = getKeySize();
+        CustomDrawable drawable = ImageLoader.getInstance().getMemmory(mUrl, res[0], res[1]);
         return drawable;
     }
 
@@ -400,11 +476,17 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         }
 
         mNeedComputeBounds = true;
+        mIsVisible = true;
         stopLoad(true);
         mUrl = url;
         startLoad();
         requestLayout();
         return;
+    }
+
+    public void file(String filePath) {
+        String uri = "file:///" + filePath;
+        url(uri);
     }
 
     private boolean isFastScroll() {
@@ -416,8 +498,6 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     }
 
     private void startLoad() {
-        ImageLoaderLog.d(TAG,
-                "mHasFrame:" + mHasFrame + ",mIsAttach:" + mIsAttach + ",mIsVisible:" + mIsVisible + ",url:" + mUrl);
         if (!mHasFrame) {
             return;
         }
@@ -426,24 +506,16 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             return;
         }
 
-        int vw = mDrawableWrapper.mViewWidth;
-        int vh = mDrawableWrapper.mViewHeight;
-        if (mNeedResize) {
-            vw = MeasureSpec.getSize(mWidthMeasureSpec);
-            vh = MeasureSpec.getSize(mHeightMeasureSpec);
-        }
-        ImageLoader.getInstance().load(mUrl, vw, vh, this, isFastScroll());
+        int[] res = getKeySize();
+        mIsLoad = true;
+        ImageLoader.getInstance().loadImage(mUrl, res[0], res[1], this, isFastScroll());
         invalidate();
     }
 
     private void stopLoad(boolean cancelRunning) {
-        int vw = mDrawableWrapper.mViewWidth;
-        int vh = mDrawableWrapper.mViewHeight;
-        if (mNeedResize) {
-            vw = MeasureSpec.getSize(mWidthMeasureSpec);
-            vh = MeasureSpec.getSize(mHeightMeasureSpec);
-        }
-        ImageLoader.getInstance().cancelLoad(mUrl, vw, vh, this, cancelRunning);
+        int[] res = getKeySize();
+        mIsLoad = false;
+        ImageLoader.getInstance().cancelLoad(mUrl, res[0], res[1], this, cancelRunning);
         if (mPlayer != null) {
             mPlayer.stop();
             mPlayer = null;
@@ -454,6 +526,8 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     private boolean mIsAttach;
 
     private boolean mIsVisible = true;
+
+    private boolean mIsLoad = false;
 
     @Override
     public void onStartTemporaryDetach() {
@@ -579,7 +653,9 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     public void onLoadingStarted(UrlSizeKey key) {
-
+        if (mListener != null) {
+            mListener.onLoadingStarted(key);
+        }
     }
 
     @Override
@@ -587,14 +663,12 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         if (!mIsAttach) {
             return;
         }
-        int vw = mDrawableWrapper.mViewWidth;
-        int vh = mDrawableWrapper.mViewHeight;
-        if (mNeedResize) {
-            vw = MeasureSpec.getSize(mWidthMeasureSpec);
-            vh = MeasureSpec.getSize(mHeightMeasureSpec);
+        if (mListener != null) {
+            mListener.onLoadingFailed(key, failReason);
         }
-        if (key.mUrl.equals(mUrl) && key.mViewWidth == vw
-                && key.mViewHeight == vh) {
+        int[] res = getKeySize();
+        if (key.mUrl.equals(mUrl) && key.mViewWidth == res[0]
+                && key.mViewHeight == res[1]) {
             mNeedComputeBounds = true;
             clearAnimation();
             invalidate();
@@ -609,15 +683,12 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         if (!mIsAttach) {
             return;
         }
-        int vw = mDrawableWrapper.mViewWidth;
-        int vh = mDrawableWrapper.mViewHeight;
-        if (mNeedResize) {
-            vw = MeasureSpec.getSize(mWidthMeasureSpec);
-            vh = MeasureSpec.getSize(mHeightMeasureSpec);
+        if (mListener != null) {
+            mListener.onLoadingComplete(key, drawable, fromMemmoryCache);
         }
-
-        if (key.mUrl.equals(mUrl) && key.mViewWidth == vw
-                && key.mViewHeight == vh) {
+        int[] res = getKeySize();
+        if (key.mUrl.equals(mUrl) && key.mViewWidth == res[0]
+                && key.mViewHeight == res[1]) {
             mNeedComputeBounds = true;
             clearAnimation();
             mDrawer = DrawerFactory.getInstance(getContext()).getDrawer(drawable, mBuilder.mDrawerType, mDrawer);
@@ -640,20 +711,36 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         if (!mIsAttach) {
             return;
         }
-        int vw = mDrawableWrapper.mViewWidth;
-        int vh = mDrawableWrapper.mViewHeight;
-        if (mNeedResize) {
-            vw = MeasureSpec.getSize(mWidthMeasureSpec);
-            vh = MeasureSpec.getSize(mHeightMeasureSpec);
+        if (mListener != null) {
+            mListener.onLoadingCancelled(key);
         }
-        if (key.mUrl.equals(mUrl) && key.mViewWidth == vw
-                && key.mViewHeight == vh) {
+        int[] res = getKeySize();
+        if (key.mUrl.equals(mUrl) && key.mViewWidth == res[0]
+                && key.mViewHeight == res[1]) {
             mNeedComputeBounds = true;
             if (mNeedResize) {
                 requestLayout();
             }
         }
 
+    }
+
+    private int[] getKeySize(){
+        int[] res = new int[2];
+        int vw = mDrawableWrapper.mViewWidth;
+        int vh = mDrawableWrapper.mViewHeight;
+        if (mNeedResize) {
+            vw = 0;
+            vh = 0;
+        }
+        res[0] = vw;
+        res[1] = vh;
+        return res;
+    }
+
+    public CustomImageView setImageLoadingListener(ImageLoadingListener listener) {
+        mListener = listener;
+        return this;
     }
 
     public CustomImageBuilder getBuilder() {
@@ -697,8 +784,6 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         private int mBorderColor;
 
         private boolean mIsNight;
-
-        private boolean mBorderSurroundContent;
 
         private float mAlpha = 1.0f;
 
@@ -811,11 +896,6 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             return this;
         }
 
-        public CustomImageBuilder setBorderSurroundContent(boolean borderSurroundContent) {
-            mBorderSurroundContent = borderSurroundContent;
-            return this;
-        }
-
         public CustomImageBuilder setAlpha(float alpha) {
             mAlpha = alpha;
             return this;
@@ -842,7 +922,6 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             mArgs.mBorderWidth = mBorderWidth;
             mArgs.mBorderColor = mBorderColor;
             mArgs.mIsNight = mIsNight;
-            mArgs.mBorderSurroundContent = mBorderSurroundContent;
             mArgs.mAlpha = mAlpha;
             mArgs.mExtraMatrix = mExtraMatrix;
             mArgs.mPath = mPath;
@@ -901,9 +980,13 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
                 mErrorScaleType = mScaleType;
             }
 
-            if (mCiv == null) {
-                return null;
+            if (mErrorRes <= 0 && mBlankRes>0) {
+                mErrorRes = mBlankRes;
+                mErrorDrawerType = mBlankDrawerType;
+                mErrorScaleType = mBlankScaleType;
+                mErrorContentChange = true;
             }
+
             if (mBlankContentChange) {
                 initBlank();
                 mBlankContentChange = false;

@@ -64,13 +64,9 @@ public abstract class BitmapShaderDrawer extends AbsDrawer {
         }
 
         float half = mArgs.mBorderWidth / 2.0f;
-        if (!mArgs.mBorderSurroundContent) {
-            mBorderRect.set(half, half, drawable.mViewWidth - half, drawable.mViewHeight - half);
-        } else {
-            mBorderRect.set(mTransformBounds.left + half, mTransformBounds.top + half, mTransformBounds.right - half,
-                    mTransformBounds.bottom - half);
-        }
-        
+        mBorderRect.set(mTransformBounds.left + half, mTransformBounds.top + half, mTransformBounds.right - half,
+                mTransformBounds.bottom - half);
+
         return true;
     }
 

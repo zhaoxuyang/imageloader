@@ -9,7 +9,6 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.os.Build;
-import android.util.Log;
 
 /**
  * bitmap pool，根据所需大小从池中取能够重用的bitmap gif和5.0以上需要
@@ -163,7 +162,7 @@ public class BitmapPool {
         return;
     }
 
-    private void trimToSize(int maxSize) {
+    public void trimToSize(int maxSize) {
         ImageLoaderLog.d(TAG, name+" size:" + size + ",maxsize:" + maxSize);
         Iterator<Map.Entry<SizeKey, LinkedList<Bitmap>>> iter = map.entrySet().iterator();
         while (iter.hasNext()) {

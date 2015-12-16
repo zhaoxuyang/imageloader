@@ -1,10 +1,9 @@
 package com.baidu.iknow.imageloader.decoder;
 
-import android.util.Log;
-
 import com.baidu.iknow.imageloader.cache.ImageLoaderLog;
 import com.baidu.iknow.imageloader.drawable.CustomDrawable;
 import com.baidu.iknow.imageloader.drawable.GifDrawable.GifDrawableFactory;
+import com.baidu.iknow.imageloader.drawable.SizeDrawable;
 import com.baidu.iknow.imageloader.gif.Gif;
 import com.baidu.iknow.imageloader.gif.GifFactory;
 
@@ -45,5 +44,14 @@ public class GifDecoder extends BaseDecoder{
         return drawable;
     }
 
-    
+    @Override
+    public SizeDrawable getSize(byte[] bytes, DecodeInfo decodeInfo) {
+        decodeInfo.mGifOptions.inJustDecodeBounds = true;
+        decodeInfo.mGifOptions.inSampleSize = 1;
+        GifFactory.decodeFromByteArray(bytes, decodeInfo.mGifOptions);
+        int bitmapWidth = decodeInfo.mGifOptions.outWidth;
+        int bitmapHeight = decodeInfo.mGifOptions.outHeight;
+        return new SizeDrawable(bitmapWidth,bitmapHeight);
+    }
+
 }

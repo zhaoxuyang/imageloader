@@ -37,12 +37,19 @@ public class DecodeInfo {
             }
         }
 
-        public void setBitmapOptions(Options opts) {
+        public DecodeInfoBuilder setBitmapOptions(Options opts) {
             mBitmapOptions = opts;
+            return this;
         }
 
-        public void setGifOptions(GifFactory.Options opts) {
+        public DecodeInfoBuilder setGifOptions(GifFactory.Options opts) {
             mGifOptions = opts;
+            return this;
+        }
+
+        public DecodeInfoBuilder setScaleToFitView(boolean scaleToFitView) {
+            mScaleToFitView = scaleToFitView;
+            return this;
         }
 
         public DecodeInfo build() {

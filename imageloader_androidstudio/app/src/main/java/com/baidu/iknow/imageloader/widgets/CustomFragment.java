@@ -10,7 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * Created by zhaoxuyang on 15/12/5.
+ * 使用懒加载需要继承这个fragment
+ * @author zhaoxuyang
+ * @since 2015-10-12
  */
 public class CustomFragment extends Fragment{
 

@@ -30,8 +30,8 @@ public class BitmapDrawable extends CustomDrawable {
 
     private void setBitmap(Bitmap bitmap) {
         mBitmap = bitmap;
-        mScaledWidth = mBitmap.getWidth();
-        mScaledHeight = mBitmap.getHeight();
+        mScaledWidth = mBitmap.getScaledWidth(CustomDrawable.sTargetDensity);
+        mScaledHeight = mBitmap.getScaledHeight(CustomDrawable.sTargetDensity);
         mShader = new BitmapShader(mBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
     }
 

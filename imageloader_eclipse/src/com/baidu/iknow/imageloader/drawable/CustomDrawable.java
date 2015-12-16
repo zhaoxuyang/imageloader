@@ -6,6 +6,8 @@ import android.graphics.drawable.Drawable;
 
 public abstract class CustomDrawable extends Drawable {
 
+    public static int sTargetDensity;
+
     @Override
     public void draw(Canvas canvas) {
 

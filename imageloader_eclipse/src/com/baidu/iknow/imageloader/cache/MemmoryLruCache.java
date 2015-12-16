@@ -1,7 +1,6 @@
 package com.baidu.iknow.imageloader.cache;
 
 import android.os.Build;
-import android.util.Log;
 
 import com.baidu.iknow.imageloader.drawable.BitmapDrawable;
 import com.baidu.iknow.imageloader.drawable.CustomDrawable;

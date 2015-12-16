@@ -2,12 +2,15 @@ package com.baidu.iknow.imageloader.widgets;
 
 import java.util.HashSet;
 
-import android.app.Activity;
 import android.support.v4.app.FragmentActivity;
-import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 
+/**
+ * 使用懒加载需要继承这个activity
+ * @author zhaoxuyang
+ * @since 2015-10-12
+ */
 public class CustomActivity extends FragmentActivity{
 
     public HashSet<CustomImageView> imageViews = new HashSet<>();

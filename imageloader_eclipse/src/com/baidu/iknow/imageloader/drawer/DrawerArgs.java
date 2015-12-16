@@ -10,15 +10,13 @@ public class DrawerArgs {
 
     public float mRadius;
 
-    public boolean mHasBorder = true;
+    public boolean mHasBorder;
 
     public int mBorderWidth;
 
     public int mBorderColor;
 
     public boolean mIsNight;
-
-    public boolean mBorderSurroundContent;
 
     public float mAlpha = 1.0f;
 
