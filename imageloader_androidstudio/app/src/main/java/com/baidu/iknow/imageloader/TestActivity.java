@@ -6,10 +6,10 @@ import java.util.HashMap;
 
 import com.baidu.iknow.imageloader.drawable.CustomDrawable;
 import com.baidu.iknow.imageloader.drawer.DrawerFactory;
-import com.baidu.iknow.imageloader.widgets.CustomActivity;
 import com.baidu.iknow.imageloader.widgets.CustomImageView;
 import com.baidu.iknow.imageloader.widgets.CustomImageView.CustomImageBuilder;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Path;
 import android.os.Bundle;
@@ -19,7 +19,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView.ScaleType;
 import android.widget.ListView;
 
-public class TestActivity extends CustomActivity {
+public class TestActivity extends Activity {
 
     private ListView listView;
 

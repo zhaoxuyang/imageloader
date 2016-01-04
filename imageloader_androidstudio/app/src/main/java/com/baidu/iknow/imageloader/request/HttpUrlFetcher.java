@@ -68,9 +68,9 @@ public class HttpUrlFetcher implements DataFetcher<InputStream> {
                     if (TextUtils.isEmpty(redirectUrlString)) {
                         throw new Exception("Received empty or null redirect url");
                     }
-                    nextUriString = urlConnection.getHeaderField("Location");
+                    nextUriString = redirectUrlString;
                     nextScheme = (nextUriString == null) ? null : Uri.parse(nextUriString).getScheme();
-                    if (nextUriString == null || nextScheme.equals(scheme)) {
+                    if (nextUriString == null || !nextScheme.equals(scheme)) {
                         break;
                     }
                     redirects++;

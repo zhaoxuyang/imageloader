@@ -55,11 +55,13 @@ public class CustomFragment extends Fragment{
     public void onStart() {
         super.onStart();
         changeVisible(true);
+        ImageLoaderLog.d(TAG,"onStart");
     }
 
     @Override
     public void onStop(){
         super.onStop();
         changeVisible(false);
+        ImageLoaderLog.d(TAG,"onStop");
     }
 }

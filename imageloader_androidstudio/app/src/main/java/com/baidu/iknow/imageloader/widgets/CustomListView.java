@@ -1,21 +1,30 @@
 package com.baidu.iknow.imageloader.widgets;
 
+import java.util.HashSet;
 import java.util.Iterator;
+
+import com.baidu.iknow.imageloader.cache.ImageLoaderLog;
 
 import android.content.Context;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
 
 /**
  * 配合图片加载框架使用，实现快速滑动的时候，不异步加载图片
+ *
  * @author zhaoxuyang
  * @since 2015-10-12
  */
 public class CustomListView extends ListView {
+
+    private static final String TAG = CustomListView.class.getSimpleName();
+
+    public HashSet<CustomImageView> imageViews = new HashSet<>();
+
+    public boolean isFastScroll;
 
     private OnScrollListener mOnScrollListener;
 
@@ -25,18 +34,13 @@ public class CustomListView extends ListView {
 
         @Override
         public void run() {
-           if(mActivity!=null){
-               Iterator<CustomImageView> iterator = mActivity.imageViews.iterator();
-               while(iterator.hasNext()){
-                   CustomImageView imageview = iterator.next();
-                   imageview.refresh();
-               }
-           }
+            Iterator<CustomImageView> iterator = imageViews.iterator();
+            while (iterator.hasNext()) {
+                CustomImageView imageview = iterator.next();
+                imageview.refresh();
+            }
         }
     };
-
-    private CustomActivity mActivity;
-
 
     private OnScrollListener mProxyScrollListener = new OnScrollListener() {
 
@@ -45,15 +49,13 @@ public class CustomListView extends ListView {
             if (mOnScrollListener != null) {
                 mOnScrollListener.onScrollStateChanged(view, scrollState);
             }
-            if (mActivity!=null) {
-                if (scrollState == OnScrollListener.SCROLL_STATE_FLING) {
-                    removeCallbacks(mRefreshRunnable);
-                    mActivity.isFastScroll = true;
-                } else if (mActivity.isFastScroll) {
-                    mActivity.isFastScroll = false;
-                    mHandler.removeCallbacks(mRefreshRunnable);
-                    mHandler.postDelayed(mRefreshRunnable, 200);
-                }
+            if (scrollState == OnScrollListener.SCROLL_STATE_FLING) {
+                isFastScroll = true;
+            } else if (isFastScroll) {
+                isFastScroll = false;
+                mHandler.removeCallbacks(mRefreshRunnable);
+                mHandler.postDelayed(mRefreshRunnable, 200);
+                ImageLoaderLog.d(TAG, "fast scroll end");
             }
         }
 
@@ -81,10 +83,6 @@ public class CustomListView extends ListView {
 
     private void init() {
         setOnScrollListener(mProxyScrollListener);
-        Context context = getContext();
-        if(context instanceof CustomActivity){
-            mActivity = (CustomActivity) context;
-        }
     }
 
     @Override
@@ -97,14 +95,14 @@ public class CustomListView extends ListView {
     }
 
     @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        mActivity.mListViews.add(this);
+    protected void onVisibilityChanged(View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        isFastScroll = false;
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        mActivity.mListViews.remove(this);
+        isFastScroll = false;
     }
 }

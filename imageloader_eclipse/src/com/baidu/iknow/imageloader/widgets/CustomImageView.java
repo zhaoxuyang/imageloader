@@ -1,6 +1,7 @@
 package com.baidu.iknow.imageloader.widgets;
 
 import com.baidu.iknow.imageloader.R;
+import com.baidu.iknow.imageloader.cache.ImageLoaderLog;
 import com.baidu.iknow.imageloader.cache.UrlSizeKey;
 import com.baidu.iknow.imageloader.drawable.BitmapDrawable;
 import com.baidu.iknow.imageloader.drawable.BitmapDrawable.BitmapDrawableFactory;
@@ -25,6 +26,7 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewParent;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
@@ -71,7 +73,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     private DrawablePlayer mPlayer;
 
-    private CustomActivity mActivity;
+    private CustomListView mListView;
 
     private CustomImageBuilder mBuilder;
 
@@ -138,11 +140,6 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             mDrawableWrapper.mPaddingRight = getPaddingRight();
             mDrawableWrapper.mPaddingTop = getPaddingTop();
             mDrawableWrapper.mPaddingBottom = getPaddingBottom();
-            Context context = getContext();
-            if (context instanceof CustomActivity) {
-                mActivity = (CustomActivity) context;
-                mActivity.imageViews.add(this);
-            }
 
             mBuilder.mergeDrawArgs();
             if (mPendingDrawable != null) {
@@ -152,6 +149,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             mIsVisible = getVisibility() == View.VISIBLE;
             mAdjustViewBoundsCompat = getContext().getApplicationInfo().targetSdkVersion <=
                     Build.VERSION_CODES.JELLY_BEAN_MR1;
+            getListView();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -474,6 +472,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         } else if (mUrl.equals(url)) {
             return;
         }
+        ImageLoaderLog.d(TAG,"VISIBLE:"+mIsVisible);
 
         mNeedComputeBounds = true;
         mIsVisible = true;
@@ -491,8 +490,8 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     private boolean isFastScroll() {
         boolean isFastScroll = false;
-        if (mActivity != null) {
-            isFastScroll = mActivity.isFastScroll;
+        if (mListView != null) {
+            isFastScroll = mListView.isFastScroll;
         }
         return isFastScroll;
     }
@@ -531,56 +530,75 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     public void onStartTemporaryDetach() {
+        super.onStartTemporaryDetach();
         if (!mIsAttach) {
             return;
         }
         mIsAttach = false;
-        super.onStartTemporaryDetach();
-        if (mActivity != null) {
-            mActivity.imageViews.remove(this);
+        if (mListView != null) {
+            mListView.imageViews.remove(this);
         }
         stopLoad(false);
     }
 
     @Override
     public void onFinishTemporaryDetach() {
+        super.onFinishTemporaryDetach();
         if (mIsAttach) {
             return;
         }
         mIsAttach = true;
-        super.onFinishTemporaryDetach();
-        if (mActivity != null) {
-            mActivity.imageViews.add(this);
+        if (mListView != null) {
+            mListView.imageViews.add(this);
         }
         startLoad();
     }
 
     @Override
     protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
         if (mIsAttach) {
             return;
         }
         mIsAttach = true;
         mIsVisible = getVisibility() == View.VISIBLE;
-        super.onAttachedToWindow();
-        if (mActivity != null) {
-            mActivity.imageViews.add(this);
+        getListView();
+        if (mListView != null) {
+            mListView.imageViews.add(this);
         }
         startLoad();
     }
 
     @Override
     protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
         if (!mIsAttach) {
             return;
         }
         mIsAttach = false;
-        super.onDetachedFromWindow();
-        if (mActivity != null) {
-            mActivity.imageViews.remove(this);
+        if (mListView != null) {
+            mListView.imageViews.remove(this);
         }
         stopLoad(true);
+        mListView = null;
     }
+
+    private void getListView(){
+        if(mListView!=null){
+            return;
+        }
+        long starttime = System.currentTimeMillis();
+        ViewParent parent = getParent();
+        while(parent instanceof View){
+            if(parent instanceof CustomListView){
+                mListView = (CustomListView) parent;
+                break;
+            }
+            parent = parent.getParent();
+        }
+        ImageLoaderLog.d(TAG,(System.currentTimeMillis() - starttime)+"");
+    }
+
 
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
@@ -648,6 +666,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     }
 
     void refresh() {
+        ImageLoaderLog.d(TAG," refresh VISIBLE:"+mIsVisible);
         startLoad();
     }
 
