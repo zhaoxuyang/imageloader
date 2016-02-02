@@ -50,6 +50,14 @@ public class UrlSizeKey {
         return h;
     }
 
+    @Override
+    public String toString() {
+        if(mViewWidth==0||mViewHeight==0){
+            return mUrl;
+        }
+        return mUrl+"##"+mViewWidth+"##"+mViewHeight;
+    }
+
     public boolean checkLegal() {
         return !TextUtils.isEmpty(mUrl);
     }

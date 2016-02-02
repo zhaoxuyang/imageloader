@@ -2,12 +2,17 @@ package com.baidu.iknow.imageloader.decoder;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import com.baidu.iknow.imageloader.cache.UrlSizeKey;
 import com.baidu.iknow.imageloader.drawable.CustomDrawable;
 import com.baidu.iknow.imageloader.drawable.SizeDrawable;
 
 import android.opengl.GLES10;
 
 public abstract class BaseDecoder {
+
+    public static final int FROM_DISK = 1;
+
+    public static final int FROM_NET = 2;
 
     private static final int DEFAULT_MAX_BITMAP_DIMENSION = 2048;
 
@@ -23,7 +28,7 @@ public abstract class BaseDecoder {
 
     public abstract boolean checkType(byte[] bytes);
 
-    public abstract CustomDrawable doDecode(byte[] bytes, DecodeInfo decodeInfo, int viewWidth, int viewHeight);
+    public abstract CustomDrawable doDecode(byte[] bytes, DecodeInfo decodeInfo, UrlSizeKey key, int from);
 
     public abstract SizeDrawable getSize(byte[] bytes, DecodeInfo decodeInfo);
 

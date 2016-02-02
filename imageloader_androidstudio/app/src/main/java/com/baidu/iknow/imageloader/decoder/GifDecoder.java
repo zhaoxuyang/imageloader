@@ -1,6 +1,7 @@
 package com.baidu.iknow.imageloader.decoder;
 
 import com.baidu.iknow.imageloader.cache.ImageLoaderLog;
+import com.baidu.iknow.imageloader.cache.UrlSizeKey;
 import com.baidu.iknow.imageloader.drawable.CustomDrawable;
 import com.baidu.iknow.imageloader.drawable.GifDrawable.GifDrawableFactory;
 import com.baidu.iknow.imageloader.drawable.SizeDrawable;
@@ -24,7 +25,9 @@ public class GifDecoder extends BaseDecoder{
     }
 
     @Override
-    public CustomDrawable doDecode(byte[] bytes, DecodeInfo decodeInfo, int viewWidth, int viewHeight) {
+    public CustomDrawable doDecode(byte[] bytes, DecodeInfo decodeInfo, UrlSizeKey key, int from) {
+        int viewWidth = key.mViewWidth;
+        int viewHeight = key.mViewHeight;
         decodeInfo.mGifOptions.inJustDecodeBounds = true;
         decodeInfo.mGifOptions.inSampleSize = 1;
         GifFactory.decodeFromByteArray(bytes, decodeInfo.mGifOptions);
@@ -32,8 +35,6 @@ public class GifDecoder extends BaseDecoder{
         int bitmapHeight = decodeInfo.mGifOptions.outHeight;
         ImageLoaderLog.d(TAG, "gif width:" + bitmapWidth + ",height:" + bitmapHeight);
         int sampleSize = getSampleSize(decodeInfo, bitmapWidth, bitmapHeight, viewWidth, viewHeight);
-        bitmapWidth /= sampleSize;
-        bitmapHeight /= sampleSize;
         decodeInfo.mGifOptions.inJustDecodeBounds = false;
         decodeInfo.mGifOptions.inSampleSize = sampleSize;
         Gif gif = GifFactory.decodeFromByteArray(bytes, decodeInfo.mGifOptions);

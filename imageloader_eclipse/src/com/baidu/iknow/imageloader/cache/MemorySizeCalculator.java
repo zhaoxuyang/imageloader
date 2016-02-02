@@ -114,7 +114,7 @@ public final class MemorySizeCalculator {
 
     public static final class Builder {
         
-        public static int MEMORY_CACHE_TARGET_SCREENS = 1;
+        public static int MEMORY_CACHE_TARGET_SCREENS = 4;
         public static int BITMAP_POOL_TARGET_SCREENS = 2;
         public static int GIF_BITMAP_POOL_TARGET_SCREENS = 1;
         public static float MAX_SIZE_MULTIPLIER = 0.4f;

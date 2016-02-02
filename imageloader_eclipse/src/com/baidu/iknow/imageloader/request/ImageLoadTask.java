@@ -116,6 +116,7 @@ public class ImageLoadTask extends AsyncTask<UrlSizeKey, Integer, CustomDrawable
             case UrlSizeKey.TYPE_LOADSIZE:
                 InputStream is = null;
                 Snapshot ss = null;
+                int from = BaseDecoder.FROM_DISK;
                 if ("file".equals(uri.getScheme())) {
                     try {
                         is = new FileInputStream(uri.getPath());
@@ -124,9 +125,13 @@ public class ImageLoadTask extends AsyncTask<UrlSizeKey, Integer, CustomDrawable
                     }
                 } else {
                     try {
-                        ss = ImageLoader.getInstance().mDiskLruCache.get(mKey.mUrl);
+                        ss = ImageLoader.getInstance().mDiskLruCache.get(mKey.toString());
+                        if(ss==null){
+                            ss = ImageLoader.getInstance().mDiskLruCache.get(mKey.mUrl);
+                        }
                         if (ss == null) {
                             fetchDataFromNet();
+                            from = BaseDecoder.FROM_NET;
                             ss = ImageLoader.getInstance().mDiskLruCache.get(mKey.mUrl);
                         }
                         if (ss != null) {
@@ -143,7 +148,7 @@ public class ImageLoadTask extends AsyncTask<UrlSizeKey, Integer, CustomDrawable
                 } else if (mException != null) {
                     return null;
                 }
-                drawable = doDecode(is);
+                drawable = doDecode(is,from);
                 if (ss != null) {
                     ss.close();
                 }
@@ -250,7 +255,7 @@ public class ImageLoadTask extends AsyncTask<UrlSizeKey, Integer, CustomDrawable
 
     }
 
-    private CustomDrawable doDecode(InputStream is) {
+    private CustomDrawable doDecode(InputStream is, int from) {
         if (is == null) {
             return null;
         }
@@ -269,7 +274,7 @@ public class ImageLoadTask extends AsyncTask<UrlSizeKey, Integer, CustomDrawable
             if (mKey.mType == UrlSizeKey.TYPE_LOADSIZE) {
                 return decoder.getSize(bytes, mDecodeInfo);
             }
-            return decoder.doDecode(bytes, mDecodeInfo, mKey.mViewWidth, mKey.mViewHeight);
+            return decoder.doDecode(bytes, mDecodeInfo, mKey,from);
         } catch (Exception e) {
             mException = e;
         } finally {

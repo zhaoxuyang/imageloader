@@ -484,8 +484,10 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     }
 
     public void file(String filePath) {
-        String uri = "file:///" + filePath;
-        url(uri);
+        if(!filePath.startsWith("file:///")){
+            filePath = "file:///" + filePath;
+        }
+        url(filePath);
     }
 
     private boolean isFastScroll() {
@@ -587,7 +589,6 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         if(mListView!=null){
             return;
         }
-        long starttime = System.currentTimeMillis();
         ViewParent parent = getParent();
         while(parent instanceof View){
             if(parent instanceof CustomListView){
@@ -596,7 +597,6 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             }
             parent = parent.getParent();
         }
-        ImageLoaderLog.d(TAG,(System.currentTimeMillis() - starttime)+"");
     }
 
 
@@ -848,6 +848,15 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             return this;
         }
 
+        public CustomImageBuilder setBlankDrawable(Drawable blankDrawable) {
+            if (mBlankDrawable != blankDrawable) {
+                mBlankDrawable = blankDrawable;
+                mBlankContentChange = true;
+            }
+            return this;
+        }
+
+
         public CustomImageBuilder setBlankScaleType(ScaleType blankScaleType) {
             if (mBlankScaleType != blankScaleType) {
                 mBlankScaleType = blankScaleType;
@@ -868,6 +877,14 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         public CustomImageBuilder setErrorRes(int errorRes) {
             if (mErrorRes != errorRes) {
                 mErrorRes = errorRes;
+                mErrorContentChange = true;
+            }
+            return this;
+        }
+
+        public CustomImageBuilder setErrorDrawable(Drawable errorDrawable) {
+            if (mErrorDrawable != errorDrawable) {
+                mErrorDrawable = errorDrawable;
                 mErrorContentChange = true;
             }
             return this;
@@ -950,35 +967,35 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         }
 
         private void initBlank() {
-            if (mBlankRes <= 0) {
-                return;
+            if (mBlankRes > 0 && mBlankDrawable == null) {
+                Drawable drawable = mCiv.getContext().getResources().getDrawable(mBlankRes);
+                if (drawable instanceof android.graphics.drawable.BitmapDrawable) {
+                    drawable = BitmapDrawableFactory
+                            .createBitmapDrawable(((android.graphics.drawable.BitmapDrawable) drawable).getBitmap());
+                }
+                mBlankDrawable = drawable;
             }
-            Drawable drawable = mCiv.getContext().getResources().getDrawable(mBlankRes);
-            if (drawable instanceof android.graphics.drawable.BitmapDrawable) {
-                drawable = BitmapDrawableFactory
-                        .createBitmapDrawable(((android.graphics.drawable.BitmapDrawable) drawable).getBitmap());
-            }
-            mBlankDrawable = drawable;
+
             mCiv.mNeedComputeBounds = true;
 
-            mCiv.mBlankDrawer = DrawerFactory.getInstance(mCiv.getContext()).getDrawer(drawable, mBlankDrawerType,
+            mCiv.mBlankDrawer = DrawerFactory.getInstance(mCiv.getContext()).getDrawer(mBlankDrawable, mBlankDrawerType,
                     mCiv.mBlankDrawer);
             mCiv.invalidate();
         }
 
         private void initError() {
-            if (mErrorRes <= 0) {
-                return;
+            if (mErrorRes > 0 && mErrorDrawable == null) {
+                Drawable drawable = mCiv.getContext().getResources().getDrawable(mErrorRes);
+                if (drawable instanceof android.graphics.drawable.BitmapDrawable) {
+                    drawable = BitmapDrawableFactory
+                            .createBitmapDrawable(((android.graphics.drawable.BitmapDrawable) drawable).getBitmap());
+                }
+                mErrorDrawable = drawable;
             }
-            Drawable drawable = mCiv.getContext().getResources().getDrawable(mErrorRes);
-            if (drawable instanceof android.graphics.drawable.BitmapDrawable) {
-                drawable = BitmapDrawableFactory
-                        .createBitmapDrawable(((android.graphics.drawable.BitmapDrawable) drawable).getBitmap());
-            }
-            mErrorDrawable = drawable;
+
             mCiv.mNeedComputeBounds = true;
 
-            mCiv.mErrorDrawer = DrawerFactory.getInstance(mCiv.getContext()).getDrawer(drawable, mErrorDrawerType,
+            mCiv.mErrorDrawer = DrawerFactory.getInstance(mCiv.getContext()).getDrawer(mErrorDrawable, mErrorDrawerType,
                     mCiv.mErrorDrawer);
             mCiv.invalidate();
         }
