@@ -967,7 +967,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         }
 
         private void initBlank() {
-            if (mBlankRes > 0 && mBlankDrawable == null) {
+            if (mBlankRes > 0) {
                 Drawable drawable = mCiv.getContext().getResources().getDrawable(mBlankRes);
                 if (drawable instanceof android.graphics.drawable.BitmapDrawable) {
                     drawable = BitmapDrawableFactory
@@ -984,7 +984,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         }
 
         private void initError() {
-            if (mErrorRes > 0 && mErrorDrawable == null) {
+            if (mErrorRes > 0) {
                 Drawable drawable = mCiv.getContext().getResources().getDrawable(mErrorRes);
                 if (drawable instanceof android.graphics.drawable.BitmapDrawable) {
                     drawable = BitmapDrawableFactory

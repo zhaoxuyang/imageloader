@@ -125,11 +125,14 @@ public class ImageLoadTask extends AsyncTask<UrlSizeKey, Integer, CustomDrawable
                     }
                 } else {
                     try {
+                        //先查找是否有适合当前控件大小的图
                         ss = ImageLoader.getInstance().mDiskLruCache.get(mKey.toString());
+                        //如果没有取原图，key为url
                         if(ss==null){
                             ss = ImageLoader.getInstance().mDiskLruCache.get(mKey.mUrl);
                         }
                         if (ss == null) {
+                            //首次下载为原图，key为url
                             fetchDataFromNet();
                             from = BaseDecoder.FROM_NET;
                             ss = ImageLoader.getInstance().mDiskLruCache.get(mKey.mUrl);
