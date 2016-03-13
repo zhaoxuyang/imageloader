@@ -141,7 +141,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             mDrawableWrapper.mPaddingTop = getPaddingTop();
             mDrawableWrapper.mPaddingBottom = getPaddingBottom();
 
-            mBuilder.mergeDrawArgs();
+            mBuilder.build();
             if (mPendingDrawable != null) {
                 setImageDrawable(mPendingDrawable);
             }
@@ -1004,16 +1004,20 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
             if (mBlankDrawerType == -1) {
                 mBlankDrawerType = mDrawerType;
+                mBlankContentChange = true;
             }
             if (mBlankScaleType == null) {
                 mBlankScaleType = mScaleType;
+                mCiv.mNeedComputeBounds = true;
             }
 
             if (mErrorDrawerType == -1) {
                 mErrorDrawerType = mDrawerType;
+                mErrorContentChange = true;
             }
             if (mBlankScaleType == null) {
                 mErrorScaleType = mScaleType;
+                mCiv.mNeedComputeBounds = true;
             }
 
             if (mErrorRes <= 0 && mBlankRes>0) {
