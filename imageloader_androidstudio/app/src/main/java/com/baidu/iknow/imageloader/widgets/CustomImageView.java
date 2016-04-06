@@ -140,15 +140,15 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             mDrawableWrapper.mPaddingRight = getPaddingRight();
             mDrawableWrapper.mPaddingTop = getPaddingTop();
             mDrawableWrapper.mPaddingBottom = getPaddingBottom();
-
-            mBuilder.build();
             if (mPendingDrawable != null) {
                 setImageDrawable(mPendingDrawable);
             }
 
+            mBuilder.build();
+
             mIsVisible = getVisibility() == View.VISIBLE;
-            mAdjustViewBoundsCompat = getContext().getApplicationInfo().targetSdkVersion <=
-                    Build.VERSION_CODES.JELLY_BEAN_MR1;
+            mAdjustViewBoundsCompat = getContext()
+                    .getApplicationInfo().targetSdkVersion <= Build.VERSION_CODES.JELLY_BEAN_MR1;
             getListView();
         } catch (Exception e) {
             e.printStackTrace();
@@ -208,16 +208,14 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             heightSize = resolveAdjustedSize(h + ptop + pbottom, mMaxHeight, heightMeasureSpec);
 
             if (desiredAspect != 0.0f) {
-                float actualAspect = (float)(widthSize - pleft - pright) /
-                        (heightSize - ptop - pbottom);
+                float actualAspect = (float) (widthSize - pleft - pright) / (heightSize - ptop - pbottom);
 
                 if (Math.abs(actualAspect - desiredAspect) > 0.0000001) {
 
                     boolean done = false;
 
                     if (resizeWidth) {
-                        int newWidth = (int)(desiredAspect * (heightSize - ptop - pbottom)) +
-                                pleft + pright;
+                        int newWidth = (int) (desiredAspect * (heightSize - ptop - pbottom)) + pleft + pright;
 
                         if (!resizeHeight && !mAdjustViewBoundsCompat) {
                             widthSize = resolveAdjustedSize(newWidth, mMaxWidth, widthMeasureSpec);
@@ -230,12 +228,10 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
                     }
 
                     if (!done && resizeHeight) {
-                        int newHeight = (int)((widthSize - pleft - pright) / desiredAspect) +
-                                ptop + pbottom;
+                        int newHeight = (int) ((widthSize - pleft - pright) / desiredAspect) + ptop + pbottom;
 
                         if (!resizeWidth && !mAdjustViewBoundsCompat) {
-                            heightSize = resolveAdjustedSize(newHeight, mMaxHeight,
-                                    heightMeasureSpec);
+                            heightSize = resolveAdjustedSize(newHeight, mMaxHeight, heightMeasureSpec);
                         }
 
                         if (newHeight <= heightSize) {
@@ -258,11 +254,10 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         setMeasuredDimension(widthSize, heightSize);
     }
 
-    private int resolveAdjustedSize(int desiredSize, int maxSize,
-                                    int measureSpec) {
+    private int resolveAdjustedSize(int desiredSize, int maxSize, int measureSpec) {
         int result = desiredSize;
         int specMode = MeasureSpec.getMode(measureSpec);
-        int specSize =  MeasureSpec.getSize(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
         switch (specMode) {
             case MeasureSpec.UNSPECIFIED:
                 result = Math.min(desiredSize, maxSize);
@@ -319,11 +314,9 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         invalidate();
     }
 
-
     @Override
     protected void onDraw(Canvas canvas) {
         // long startTime = System.currentTimeMillis();
-        super.onDraw(canvas);
         drawContent(canvas);
         // Log.d(TAG, (System.currentTimeMillis() - startTime) + "");
     }
@@ -370,8 +363,6 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         mDrawableWrapper.mDrawable = null;
         mNeedComputeBounds = false;
     }
-
-
 
     private ScaleType mPendingScaleType;
 
@@ -422,9 +413,23 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     }
 
     @Override
+    public void setImageMatrix(Matrix matrix) {
+        mDrawableWrapper.mCustomMatrix.set(matrix);
+    }
+
+    @Override
+    public Matrix getImageMatrix() {
+        if (mDrawer == null) {
+            return new Matrix();
+        }
+        return mDrawer.getDrawMatrix();
+    }
+
+    @Override
     public Drawable getDrawable() {
         Drawable drawable = getDrawableFromCache();
         drawable = drawable != null ? drawable : super.getDrawable();
+
         if (mPlayer == null) {
             mPlayer = DrawablePlayerFactory.getPlayer(drawable, this);
         }
@@ -435,7 +440,10 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         if (drawable != null) {
             mDrawableWrapper.mDrawable = drawable;
             mDrawableWrapper.mScaleType = mBuilder.mScaleType;
-            mDrawableWrapper.mDrawer = mDrawer;
+            mDrawableWrapper.mMatrixScaleType = mBuilder.mMatrixScaleType;
+            mDrawableWrapper.mDrawer = DrawerFactory.getInstance(getContext()).getDrawer(drawable, mBuilder.mDrawerType,
+                    mDrawer);
+
         } else {
             if (!mIsLoad) {
                 startLoad();
@@ -443,11 +451,13 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             if (ImageLoader.getInstance().mFailedQuene.contains(mUrl)) {
                 mDrawableWrapper.mDrawable = mBuilder.mErrorDrawable;
                 mDrawableWrapper.mScaleType = mBuilder.mErrorScaleType;
+                mDrawableWrapper.mMatrixScaleType = mBuilder.mMatrixScaleType;
                 mDrawableWrapper.mDrawer = mErrorDrawer;
                 drawable = mBuilder.mErrorDrawable;
             } else {
                 mDrawableWrapper.mDrawable = mBuilder.mBlankDrawable;
                 mDrawableWrapper.mScaleType = mBuilder.mBlankScaleType;
+                mDrawableWrapper.mMatrixScaleType = mBuilder.mMatrixScaleType;
                 mDrawableWrapper.mDrawer = mBlankDrawer;
                 drawable = mBuilder.mBlankDrawable;
             }
@@ -472,7 +482,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         } else if (mUrl.equals(url)) {
             return;
         }
-        ImageLoaderLog.d(TAG,"VISIBLE:"+mIsVisible);
+        ImageLoaderLog.d(TAG, "VISIBLE:" + mIsVisible);
 
         mNeedComputeBounds = true;
         mIsVisible = true;
@@ -484,7 +494,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     }
 
     public void file(String filePath) {
-        if(!filePath.startsWith("file:///")){
+        if (!filePath.startsWith("file:///")) {
             filePath = "file:///" + filePath;
         }
         url(filePath);
@@ -585,20 +595,19 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         mListView = null;
     }
 
-    private void getListView(){
-        if(mListView!=null){
+    private void getListView() {
+        if (mListView != null) {
             return;
         }
         ViewParent parent = getParent();
-        while(parent instanceof View){
-            if(parent instanceof CustomListView){
+        while (parent instanceof View) {
+            if (parent instanceof CustomListView) {
                 mListView = (CustomListView) parent;
                 break;
             }
             parent = parent.getParent();
         }
     }
-
 
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
@@ -666,7 +675,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     }
 
     void refresh() {
-        ImageLoaderLog.d(TAG," refresh VISIBLE:"+mIsVisible);
+        ImageLoaderLog.d(TAG, " refresh VISIBLE:" + mIsVisible);
         startLoad();
     }
 
@@ -686,8 +695,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             mListener.onLoadingFailed(key, failReason);
         }
         int[] res = getKeySize();
-        if (key.mUrl.equals(mUrl) && key.mViewWidth == res[0]
-                && key.mViewHeight == res[1]) {
+        if (key.mUrl.equals(mUrl) && key.mViewWidth == res[0] && key.mViewHeight == res[1]) {
             mNeedComputeBounds = true;
             clearAnimation();
             invalidate();
@@ -706,8 +714,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             mListener.onLoadingComplete(key, drawable, fromMemmoryCache);
         }
         int[] res = getKeySize();
-        if (key.mUrl.equals(mUrl) && key.mViewWidth == res[0]
-                && key.mViewHeight == res[1]) {
+        if (key.mUrl.equals(mUrl) && key.mViewWidth == res[0] && key.mViewHeight == res[1]) {
             mNeedComputeBounds = true;
             clearAnimation();
             mDrawer = DrawerFactory.getInstance(getContext()).getDrawer(drawable, mBuilder.mDrawerType, mDrawer);
@@ -734,8 +741,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             mListener.onLoadingCancelled(key);
         }
         int[] res = getKeySize();
-        if (key.mUrl.equals(mUrl) && key.mViewWidth == res[0]
-                && key.mViewHeight == res[1]) {
+        if (key.mUrl.equals(mUrl) && key.mViewWidth == res[0] && key.mViewHeight == res[1]) {
             mNeedComputeBounds = true;
             if (mNeedResize) {
                 requestLayout();
@@ -744,7 +750,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     }
 
-    private int[] getKeySize(){
+    private int[] getKeySize() {
         int[] res = new int[2];
         int vw = mDrawableWrapper.mViewWidth;
         int vh = mDrawableWrapper.mViewHeight;
@@ -768,15 +774,17 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     public static class CustomImageBuilder {
 
-        private boolean mContentChange;
+        public static int BLANK_DEFAULT =  R.drawable.ic_default_picture;
+
+        public static int ERROR_DEFAULT =  R.drawable.ic_default_picture;
 
         private int mDrawerType = DrawerFactory.NORMAL;
 
         private ScaleType mScaleType = ScaleType.FIT_XY;
 
-        private boolean mBlankContentChange;
+        private MatrixScaleType mMatrixScaleType = MatrixScaleType.MATRIX;
 
-        private int mBlankRes = R.drawable.ic_default_picture;
+        private int mBlankRes = BLANK_DEFAULT;
 
         private ScaleType mBlankScaleType = null;
 
@@ -784,9 +792,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
         private Drawable mBlankDrawable;
 
-        private boolean mErrorContentChange;
-
-        private int mErrorRes = R.drawable.ic_default_picture;
+        private int mErrorRes = ERROR_DEFAULT;
 
         private ScaleType mErrorScaleType = null;
 
@@ -824,10 +830,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         }
 
         public CustomImageBuilder setDrawerType(int drawerType) {
-            if (mDrawerType != drawerType) {
-                mDrawerType = drawerType;
-                mContentChange = true;
-            }
+            mDrawerType = drawerType;
             return this;
         }
 
@@ -840,22 +843,27 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             return this;
         }
 
-        public CustomImageBuilder setBlankRes(int blankRes) {
-            if (mBlankRes != blankRes) {
-                mBlankRes = blankRes;
-                mBlankContentChange = true;
+        public CustomImageBuilder setMatrixScaleType(MatrixScaleType matrixScaleType) {
+            if (mScaleType != ScaleType.MATRIX) {
+                return this;
             }
+            if (mMatrixScaleType != matrixScaleType) {
+                mMatrixScaleType = matrixScaleType;
+                mCiv.mNeedComputeBounds = true;
+                mCiv.invalidate();
+            }
+            return this;
+        }
+
+        public CustomImageBuilder setBlankRes(int blankRes) {
+            mBlankRes = blankRes;
             return this;
         }
 
         public CustomImageBuilder setBlankDrawable(Drawable blankDrawable) {
-            if (mBlankDrawable != blankDrawable) {
-                mBlankDrawable = blankDrawable;
-                mBlankContentChange = true;
-            }
+            mBlankDrawable = blankDrawable;
             return this;
         }
-
 
         public CustomImageBuilder setBlankScaleType(ScaleType blankScaleType) {
             if (mBlankScaleType != blankScaleType) {
@@ -867,26 +875,17 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         }
 
         public CustomImageBuilder setBlankDrawerType(int blankDrawerType) {
-            if (mBlankDrawerType != blankDrawerType) {
-                mBlankDrawerType = blankDrawerType;
-                mBlankContentChange = true;
-            }
+            mBlankDrawerType = blankDrawerType;
             return this;
         }
 
         public CustomImageBuilder setErrorRes(int errorRes) {
-            if (mErrorRes != errorRes) {
-                mErrorRes = errorRes;
-                mErrorContentChange = true;
-            }
+            mErrorRes = errorRes;
             return this;
         }
 
         public CustomImageBuilder setErrorDrawable(Drawable errorDrawable) {
-            if (mErrorDrawable != errorDrawable) {
-                mErrorDrawable = errorDrawable;
-                mErrorContentChange = true;
-            }
+            mErrorDrawable = errorDrawable;
             return this;
         }
 
@@ -900,10 +899,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         }
 
         public CustomImageBuilder setErrorDrawerType(int errorDrawerType) {
-            if (mErrorDrawerType != errorDrawerType) {
-                mErrorDrawerType = errorDrawerType;
-                mErrorContentChange = true;
-            }
+            mErrorDrawerType = errorDrawerType;
             return this;
         }
 
@@ -975,9 +971,10 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
                 }
                 mBlankDrawable = drawable;
             }
-
+            if (mBlankDrawable == null) {
+                return;
+            }
             mCiv.mNeedComputeBounds = true;
-
             mCiv.mBlankDrawer = DrawerFactory.getInstance(mCiv.getContext()).getDrawer(mBlankDrawable, mBlankDrawerType,
                     mCiv.mBlankDrawer);
             mCiv.invalidate();
@@ -992,9 +989,10 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
                 }
                 mErrorDrawable = drawable;
             }
-
+            if (mErrorDrawable == null) {
+                return;
+            }
             mCiv.mNeedComputeBounds = true;
-
             mCiv.mErrorDrawer = DrawerFactory.getInstance(mCiv.getContext()).getDrawer(mErrorDrawable, mErrorDrawerType,
                     mCiv.mErrorDrawer);
             mCiv.invalidate();
@@ -1004,7 +1002,6 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
             if (mBlankDrawerType == -1) {
                 mBlankDrawerType = mDrawerType;
-                mBlankContentChange = true;
             }
             if (mBlankScaleType == null) {
                 mBlankScaleType = mScaleType;
@@ -1013,45 +1010,48 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
             if (mErrorDrawerType == -1) {
                 mErrorDrawerType = mDrawerType;
-                mErrorContentChange = true;
             }
-            if (mBlankScaleType == null) {
+            if (mErrorScaleType == null) {
                 mErrorScaleType = mScaleType;
                 mCiv.mNeedComputeBounds = true;
             }
 
-            if (mErrorRes <= 0 && mBlankRes>0) {
-                mErrorRes = mBlankRes;
-                mErrorDrawerType = mBlankDrawerType;
-                mErrorScaleType = mBlankScaleType;
-                mErrorContentChange = true;
+            initBlank();
+            initError();
+            if (mErrorDrawable == null) {
+                mErrorDrawable = mBlankDrawable;
+                mCiv.mErrorDrawer = mCiv.mBlankDrawer;
             }
-
-            if (mBlankContentChange) {
-                initBlank();
-                mBlankContentChange = false;
+            Drawable drawable = mCiv.getDrawable();
+            if (drawable != null) {
+                mCiv.mNeedComputeBounds = true;
+                mCiv.mDrawer = DrawerFactory.getInstance(mCiv.getContext()).getDrawer(drawable, mDrawerType,
+                        mCiv.mDrawer);
+                mCiv.invalidate();
             }
-
-            if (mErrorContentChange) {
-                initError();
-                mErrorContentChange = false;
-            }
-
-            if (mContentChange) {
-                Drawable drawable = mCiv.getDrawable();
-                if (drawable != null) {
-                    mCiv.mNeedComputeBounds = true;
-                    mCiv.mDrawer = DrawerFactory.getInstance(mCiv.getContext()).getDrawer(drawable, mDrawerType,
-                            mCiv.mDrawer);
-                    mCiv.invalidate();
-                }
-                mContentChange = false;
-            }
-
             mergeDrawArgs();
             return mCiv;
         }
 
+    }
+
+    /**
+     * scaletype为matrix时，可以设置
+     */
+    public enum MatrixScaleType {
+        /**
+         * 就按原有的
+         */
+        MATRIX(0), /**
+                    * 头部要完整显示
+                    */
+        TOP_CROP(1);
+
+        MatrixScaleType(int ni) {
+            nativeInt = ni;
+        }
+
+        final int nativeInt;
     }
 
 }

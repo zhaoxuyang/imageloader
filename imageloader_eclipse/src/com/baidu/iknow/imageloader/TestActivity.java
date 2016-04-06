@@ -8,6 +8,7 @@ import com.baidu.iknow.imageloader.drawable.CustomDrawable;
 import com.baidu.iknow.imageloader.drawer.DrawerFactory;
 import com.baidu.iknow.imageloader.widgets.CustomImageView;
 import com.baidu.iknow.imageloader.widgets.CustomImageView.CustomImageBuilder;
+import com.baidu.iknow.imageloader.widgets.CustomImageView.MatrixScaleType;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -26,6 +27,8 @@ public class TestActivity extends Activity {
     private ArrayList<ItemData> mdatas = new ArrayList<TestActivity.ItemData>();
 
     private ScaleType scaleType = ScaleType.FIT_XY;
+    
+    private MatrixScaleType matrixScaleType = MatrixScaleType.MATRIX;
 
     private int drawerType = 0;
 
@@ -153,6 +156,10 @@ public class TestActivity extends Activity {
             case R.id.fitcenter:
                 scaleType = ScaleType.FIT_CENTER;
                 break;
+            case R.id.matrixtopcrop:
+                scaleType = ScaleType.MATRIX;
+                matrixScaleType = MatrixScaleType.TOP_CROP;
+                break;
             case R.id.normalDrawer:
                 drawerType = DrawerFactory.NORMAL;
                 break;
@@ -241,7 +248,7 @@ public class TestActivity extends Activity {
                     }
                     builder.setBlankRes(R.drawable.s).setBlankScaleType(scaleType).setBlankDrawerType(drawerType)
                             .setErrorRes(R.drawable.error).setErrorScaleType(scaleType).setErrorDrawerType(drawerType)
-                            .setDrawerType(drawerType).setScaleType(scaleType).build().url(data.key);
+                            .setDrawerType(drawerType).setScaleType(scaleType).setMatrixScaleType(matrixScaleType).build().url(data.key);
                     break;
             }
 

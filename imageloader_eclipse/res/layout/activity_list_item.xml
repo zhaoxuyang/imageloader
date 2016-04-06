@@ -69,6 +69,12 @@
                 android:layout_height="wrap_content"
                 android:onClick="onClick"
                 android:text="fitend" />
+              <Button
+                android:id="@+id/matrixtopcrop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onClick"
+                android:text="matrixtopcrop" />
         </LinearLayout>
     </HorizontalScrollView>
 
