@@ -14,6 +14,8 @@ public class DecodeInfo {
 
     public boolean mScaleToFitView = true;
 
+    public boolean needRecycleUse;
+
     private DecodeInfo(DecodeInfoBuilder builder) {
         mBitmapOptions = builder.mBitmapOptions;
         mGifOptions = builder.mGifOptions;

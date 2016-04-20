@@ -25,6 +25,8 @@ public class UrlSizeKey {
 
     public int mType = TYPE_LOADIMAGE;
 
+    public boolean mNeedRecycle;
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof UrlSizeKey)) {

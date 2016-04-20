@@ -8,6 +8,8 @@ public abstract class CustomDrawable extends Drawable {
 
     public static int sTargetDensity;
 
+    public boolean needRecycleUse;
+
     @Override
     public void draw(Canvas canvas) {
 

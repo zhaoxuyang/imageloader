@@ -339,9 +339,16 @@ public class ImageLoader {
         mGifBitmapPool.trimToSize(0);
     }
 
+    public void loadImage(String url, ImageLoadingListener listener) {
+        loadImage(url, 0, 0, listener, false, false);
+    }
+
+    public void loadImage(String url, int width, int height, ImageLoadingListener listener) {
+        loadImage(url, width, height, listener, false, false);
+    }
 
     public void loadImage(String url, int width, int height, ImageLoadingListener listener,
-                          boolean isFastScroll) {
+                          boolean isFastScroll,boolean needRecycleUse) {
 
         if (TextUtils.isEmpty(url)) {
             return;
@@ -380,6 +387,7 @@ public class ImageLoader {
         task = new ImageLoadTask();
         task.mImageLoadingListener = mDispatchListener;
         task.mKey = key;
+        task.mDecodeInfo.needRecycleUse = needRecycleUse;
         HashSet<ImageLoadingListener> listeners = new HashSet<ImageLoadingListener>();
         listeners.add(listener);
         mTasks.put(key, task);

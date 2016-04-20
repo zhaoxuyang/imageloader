@@ -48,7 +48,7 @@ public class ImageLoadTask extends AsyncTask<UrlSizeKey, Integer, CustomDrawable
     private Exception mException;
 
     public ImageLoadTask() {
-
+        mDecodeInfo = new DecodeInfo.DecodeInfoBuilder().build();
     }
 
     public ImageLoadTask(ImageLoadTask task) {
@@ -86,9 +86,6 @@ public class ImageLoadTask extends AsyncTask<UrlSizeKey, Integer, CustomDrawable
             return null;
         }
 
-        if (mDecodeInfo == null) {
-            mDecodeInfo = new DecodeInfo.DecodeInfoBuilder().build();
-        }
 
         Uri uri = Uri.parse(mKey.mUrl);
         String schema = uri.getScheme();
@@ -277,7 +274,9 @@ public class ImageLoadTask extends AsyncTask<UrlSizeKey, Integer, CustomDrawable
             if (mKey.mType == UrlSizeKey.TYPE_LOADSIZE) {
                 return decoder.getSize(bytes, mDecodeInfo);
             }
-            return decoder.doDecode(bytes, mDecodeInfo, mKey,from);
+            CustomDrawable drawable = decoder.doDecode(bytes, mDecodeInfo, mKey,from);
+            drawable.needRecycleUse = mDecodeInfo.needRecycleUse;
+            return drawable;
         } catch (Exception e) {
             mException = e;
         } finally {

@@ -519,7 +519,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
         int[] res = getKeySize();
         mIsLoad = true;
-        ImageLoader.getInstance().loadImage(mUrl, res[0], res[1], this, isFastScroll());
+        ImageLoader.getInstance().loadImage(mUrl, res[0], res[1], this, isFastScroll(),true);
         invalidate();
     }
 
@@ -657,6 +657,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     protected boolean verifyDrawable(Drawable dr) {
+        super.verifyDrawable(dr);
         return true;
     }
 
