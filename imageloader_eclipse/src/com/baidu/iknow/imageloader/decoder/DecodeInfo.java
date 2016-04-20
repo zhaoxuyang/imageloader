@@ -12,19 +12,24 @@ public class DecodeInfo {
 
     public GifFactory.Options mGifOptions = new GifFactory.Options();
 
+    public WebPFactory.Options mWebPOptions = new WebPFactory.Options();
+
     public boolean mScaleToFitView = true;
 
     private DecodeInfo(DecodeInfoBuilder builder) {
         mBitmapOptions = builder.mBitmapOptions;
         mGifOptions = builder.mGifOptions;
+        mWebPOptions = builder.mWebPOptions;
         mScaleToFitView = builder.mScaleToFitView;
     }
 
     public static class DecodeInfoBuilder {
-        
+
         private Options mBitmapOptions = new Options();
-        
+
         private GifFactory.Options mGifOptions = new GifFactory.Options();
+
+        private WebPFactory.Options mWebPOptions = new WebPFactory.Options();
 
         private boolean mScaleToFitView = true;
 
@@ -44,6 +49,11 @@ public class DecodeInfo {
 
         public DecodeInfoBuilder setGifOptions(GifFactory.Options opts) {
             mGifOptions = opts;
+            return this;
+        }
+
+        public DecodeInfoBuilder setWebPOptions(WebPFactory.Options opts) {
+            mWebPOptions = opts;
             return this;
         }
 

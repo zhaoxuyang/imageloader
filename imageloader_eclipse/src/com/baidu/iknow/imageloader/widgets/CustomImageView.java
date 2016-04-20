@@ -1042,9 +1042,10 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         /**
          * 就按原有的
          */
-        MATRIX(0), /**
-                    * 头部要完整显示
-                    */
+        MATRIX(0), 
+        /**
+         * 头部要完整显示
+         */
         TOP_CROP(1);
 
         MatrixScaleType(int ni) {

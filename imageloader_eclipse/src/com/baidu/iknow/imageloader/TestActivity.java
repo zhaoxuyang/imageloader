@@ -45,6 +45,7 @@ public class TestActivity extends Activity {
         // try {
 
         setContentView(R.layout.activity_list_item);
+        addData("https://raw.githubusercontent.com/zhaoxuyang/imageloader/master/imageloader1.png");
         addData("http://img.name2012.com/uploads/allimg/2015-06/30-023131_451.jpg");
         addData("http://www.baidu.com");
         addData("http://tb.himg.baidu.com/sys/portrait/item/6ebee68891e69c89e5a5bde5908de5ad9779799774");
@@ -111,6 +112,10 @@ public class TestActivity extends Activity {
         data.key = url;
         data.type = 1;
         mdatas.add(data);
+    }
+    
+    private void addLocalData(){
+        
     }
 
     private void checkBuffer(Bitmap bm) {
