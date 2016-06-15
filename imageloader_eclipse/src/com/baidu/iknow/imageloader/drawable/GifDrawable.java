@@ -1,15 +1,15 @@
 package com.baidu.iknow.imageloader.drawable;
 
+import com.baidu.iknow.imageloader.cache.Pools;
 import com.baidu.iknow.imageloader.gif.Gif;
+
 import android.graphics.Bitmap;
-import android.support.v4.util.Pools;
-import android.support.v4.util.Pools.Pool;
 
 public class GifDrawable extends CustomDrawable {
 
     private static final int MAX_POOL_SIZE = 40;
 
-    private static final Pool<GifDrawable> sPool = new Pools.SynchronizedPool<GifDrawable>(MAX_POOL_SIZE);
+    private static final Pools.Pool<GifDrawable> sPool = new Pools.SynchronizedPool<GifDrawable>(MAX_POOL_SIZE);
 
     public Gif mGif;
 
@@ -68,6 +68,16 @@ public class GifDrawable extends CustomDrawable {
     @Override
     public int getIntrinsicHeight() {
         return mGif.mHeight;
+    }
+
+    @Override
+    public Bitmap asBitmap() {
+        if (mGif == null) {
+            return null;
+        }
+        Bitmap bm = Bitmap.createBitmap(mGif.mWidth, mGif.mHeight, Bitmap.Config.ARGB_8888);
+        updateFrame(0, bm);
+        return bm;
     }
 
     public static class GifDrawableFactory {

@@ -1,5 +1,6 @@
 package com.baidu.iknow.imageloader.drawable;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.drawable.Drawable;
@@ -35,5 +36,10 @@ public abstract class CustomDrawable extends Drawable {
     public abstract boolean checkLegal();
     
     public abstract int getSize();
+
+    public Bitmap asBitmap(){
+        return null;
+    }
+
 
 }

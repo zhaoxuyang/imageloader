@@ -94,38 +94,41 @@ containing a value of this type.
         public static final int centercrop=0x7f060007;
         public static final int centerinside=0x7f060006;
         public static final int circle=0x7f060000;
-        public static final int circleDrawer=0x7f06000e;
+        public static final int circleDrawer=0x7f06000f;
         public static final int custom=0x7f060001;
-        public static final int customDrawer=0x7f06000f;
+        public static final int customDrawer=0x7f060010;
         public static final int fitcenter=0x7f06000a;
         public static final int fitend=0x7f06000b;
         public static final int fitstart=0x7f060009;
         public static final int fitxy=0x7f060005;
-        public static final int iv=0x7f060010;
+        public static final int iv=0x7f060011;
         public static final int list=0x7f060004;
+        public static final int matrixtopcrop=0x7f06000c;
         public static final int normal=0x7f060002;
-        public static final int normalDrawer=0x7f06000c;
+        public static final int normalDrawer=0x7f06000d;
         public static final int round_rect=0x7f060003;
-        public static final int roundrectDrawer=0x7f06000d;
+        public static final int roundrectDrawer=0x7f06000e;
     }
     public static final class layout {
         public static final int activity_list_item=0x7f030000;
         public static final int view_item=0x7f030001;
     }
     public static final class string {
-        public static final int app_name=0x7f040000;
+        public static final int app_name=0x7f050000;
     }
     public static final class style {
-        /** 
+        /**  API 11 theme customizations can go here. 
+ API 14 theme customizations can go here. 
+
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
         
          */
-        public static final int AppBaseTheme=0x7f050000;
+        public static final int AppBaseTheme=0x7f040000;
         /**  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f050001;
+        public static final int AppTheme=0x7f040001;
     }
     public static final class styleable {
         /** Attributes that can be used with a CustomImageView.

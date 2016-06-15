@@ -24,12 +24,16 @@
             <enum name="circle" value="2"/>
             <enum name="custom" value="3"/>
         </attr>
-    </declare-styleable></file><file path="/Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/res/values/strings.xml" qualifiers=""><string name="app_name">myimageloader</string></file><file path="/Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/res/values/styles.xml" qualifiers=""><style name="AppBaseTheme" parent="android:Theme.Light">
+    </declare-styleable></file><file path="/Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/res/values/strings.xml" qualifiers=""><string name="app_name">myimageloader</string></file><file path="/Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/res/values/styles.xml" qualifiers=""><style name="AppTheme" parent="AppBaseTheme">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style><style name="AppBaseTheme" parent="android:Theme.Light">
         <!--
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
         -->
-    </style><style name="AppTheme" parent="AppBaseTheme">
-        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style></file><file path="/Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/res/values-v14/styles.xml" qualifiers="v14"><style name="AppBaseTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+        <!-- API 14 theme customizations can go here. -->
+    </style></file><file name="ic_launcher" path="/Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/res/drawable-xhdpi/ic_launcher.png" qualifiers="xhdpi-v4" type="drawable"/><file path="/Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/res/values-v11/styles.xml" qualifiers="v11"><style name="AppBaseTheme" parent="android:Theme.Holo.Light">
+        <!-- API 11 theme customizations can go here. -->
     </style></file></source><source path="/Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/build/generated/res/rs/debug"/><source path="/Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/build/generated/res/resValues/debug"/></dataSet><dataSet config="debug" generated-set="debug$Generated"><source path="/Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/debug/res"/></dataSet><mergedItems><configuration qualifiers=""><declare-styleable name="CustomImageView"><attr format="dimension" name="civ_radius"/><attr format="boolean" name="civ_hasBorder"/><attr format="dimension" name="civ_borderWidth"/><attr format="color|reference" name="civ_borderColor"/><attr format="boolean" name="civ_borderSurroundContent"/><attr format="boolean" name="civ_isNight"/><attr format="float" name="civ_alpha"/><attr format="enum" name="civ_drawerType"><enum name="normal" value="0"/><enum name="round_rect" value="1"/><enum name="circle" value="2"/><enum name="custom" value="3"/></attr></declare-styleable></configuration></mergedItems></merger>

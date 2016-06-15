@@ -200,6 +200,7 @@ public class ImageLoader {
                     }
                 }
             }
+            runNext();
         }
 
         @Override
@@ -222,6 +223,7 @@ public class ImageLoader {
                     }
                 }
             }
+            runNext();
         }
     };
 
@@ -262,6 +264,7 @@ public class ImageLoader {
                     }
                 }
             }
+            runNext();
         }
 
         @Override
@@ -281,6 +284,7 @@ public class ImageLoader {
                     }
                 }
             }
+            runNext();
         }
     };
 
@@ -332,11 +336,21 @@ public class ImageLoader {
         CustomDrawable.sTargetDensity = context.getResources().getDisplayMetrics().densityDpi;
     }
 
-    public void clear(){
-        ImageLoaderLog.d(TAG,"clear");
+    public void clearMemmoryCache(){
+        ImageLoaderLog.d(TAG,"clear memmory");
         mMemmoryCache.trimToSize(0);
         mBitmapPool.trimToSize(0);
         mGifBitmapPool.trimToSize(0);
+    }
+
+    public void removeFromDiskCache(String url){
+        clearMemmoryCache();
+        mDiskLruCache.delete(url);
+    }
+
+    public void clearDiskCache(){
+        clearMemmoryCache();
+        mDiskLruCache.clear();
     }
 
     public void loadImage(String url, ImageLoadingListener listener) {

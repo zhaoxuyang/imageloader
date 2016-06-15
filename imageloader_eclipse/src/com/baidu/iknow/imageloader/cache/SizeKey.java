@@ -1,8 +1,5 @@
 package com.baidu.iknow.imageloader.cache;
 
-import android.support.v4.util.Pools;
-import android.support.v4.util.Pools.Pool;
-
 /**
  * 
  * @author zhaoxuyang
@@ -12,7 +9,7 @@ public class SizeKey {
 
     private static final int MAX_POOL_SIZE = 40;
 
-    private static final Pool<SizeKey> sPool = new Pools.SynchronizedPool<SizeKey>(MAX_POOL_SIZE);
+    private static final Pools.Pool<SizeKey> sPool = new Pools.SynchronizedPool<SizeKey>(MAX_POOL_SIZE);
 
     public int mWidth;
 

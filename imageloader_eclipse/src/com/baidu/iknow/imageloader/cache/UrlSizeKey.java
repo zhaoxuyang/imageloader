@@ -1,8 +1,6 @@
 package com.baidu.iknow.imageloader.cache;
 
 
-import android.support.v4.util.Pools;
-import android.support.v4.util.Pools.Pool;
 import android.text.TextUtils;
 
 public class UrlSizeKey {
@@ -15,7 +13,7 @@ public class UrlSizeKey {
 
     private static final int MAX_POOL_SIZE = 40;
 
-    private static final Pool<UrlSizeKey> sPool = new Pools.SynchronizedPool<UrlSizeKey>(MAX_POOL_SIZE);
+    private static final Pools.Pool<UrlSizeKey> sPool = new Pools.SynchronizedPool<UrlSizeKey>(MAX_POOL_SIZE);
 
     public String mUrl;
 

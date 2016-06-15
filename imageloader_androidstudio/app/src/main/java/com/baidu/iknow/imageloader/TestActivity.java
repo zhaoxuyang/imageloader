@@ -24,7 +24,7 @@ public class TestActivity extends Activity {
 
     private ListView listView;
 
-    private ArrayList<ItemData> mdatas = new ArrayList<ItemData>();
+    private ArrayList<ItemData> mdatas = new ArrayList<TestActivity.ItemData>();
 
     private ScaleType scaleType = ScaleType.FIT_XY;
     

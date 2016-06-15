@@ -1,20 +1,19 @@
 package com.baidu.iknow.imageloader.drawable;
 
 import com.baidu.iknow.imageloader.bitmap.BitmapLock;
+import com.baidu.iknow.imageloader.cache.Pools;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Shader;
 import android.os.Build;
-import android.support.v4.util.Pools;
-import android.support.v4.util.Pools.Pool;
 
 public class BitmapDrawable extends CustomDrawable {
 
     private static final int MAX_POOL_SIZE = 40;
 
-    private static final Pool<BitmapDrawable> sPool = new Pools.SynchronizedPool<BitmapDrawable>(MAX_POOL_SIZE);
+    private static final Pools.Pool<BitmapDrawable> sPool = new Pools.SynchronizedPool<BitmapDrawable>(MAX_POOL_SIZE);
 
     public BitmapShader mShader;
 
@@ -98,4 +97,8 @@ public class BitmapDrawable extends CustomDrawable {
         }
     }
 
+    @Override
+    public Bitmap asBitmap() {
+        return mBitmap;
+    }
 }

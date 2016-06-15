@@ -1,18 +1,18 @@
 [
     {
-        "merged": "/Users/zhaoxuyang/Documents/imageloader_androidstudio/app/build/intermediates/res/merged/debug/layout/activity_list_item.xml",
-        "source": "/Users/zhaoxuyang/Documents/imageloader_androidstudio/app/src/main/res/layout/activity_list_item.xml"
-    },
-    {
         "merged": "/Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/build/intermediates/res/merged/debug/layout/activity_list_item.xml",
         "source": "/Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/res/layout/activity_list_item.xml"
+    },
+    {
+        "merged": "/Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/build/intermediates/res/merged/debug/layout/view_item.xml",
+        "source": "/Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/res/layout/view_item.xml"
     },
     {
         "merged": "/Users/zhaoxuyang/Documents/imageloader_androidstudio/app/build/intermediates/res/merged/debug/layout/view_item.xml",
         "source": "/Users/zhaoxuyang/Documents/imageloader_androidstudio/app/src/main/res/layout/view_item.xml"
     },
     {
-        "merged": "/Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/build/intermediates/res/merged/debug/layout/view_item.xml",
-        "source": "/Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/res/layout/view_item.xml"
+        "merged": "/Users/zhaoxuyang/Documents/imageloader_androidstudio/app/build/intermediates/res/merged/debug/layout/activity_list_item.xml",
+        "source": "/Users/zhaoxuyang/Documents/imageloader_androidstudio/app/src/main/res/layout/activity_list_item.xml"
     }
 ]
