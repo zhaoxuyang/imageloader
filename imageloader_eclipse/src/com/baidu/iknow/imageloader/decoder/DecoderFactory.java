@@ -10,7 +10,7 @@ public class DecoderFactory {
     private static BaseDecoder sCommonDecoder = new BitmapDecoder();
     static {
         sCustomDecoder.add(new GifDecoder());
-        //sCustomDecoder.add(new WebPDecoder());
+        sCustomDecoder.add(new WebPDecoder());
     }
 
     private DecoderFactory() {
