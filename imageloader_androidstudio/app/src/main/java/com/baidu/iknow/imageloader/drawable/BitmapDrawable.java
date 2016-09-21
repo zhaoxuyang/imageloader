@@ -6,6 +6,7 @@ import com.baidu.iknow.imageloader.cache.Pools;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
+import android.graphics.Color;
 import android.graphics.Shader;
 import android.os.Build;
 

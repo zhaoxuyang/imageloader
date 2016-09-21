@@ -3,6 +3,7 @@ package com.baidu.iknow.imageloader.decoder;
 import com.baidu.iknow.imageloader.gif.GifFactory;
 
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory.Options;
 import android.os.Build;
 

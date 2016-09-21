@@ -27,7 +27,7 @@ public interface DiskCache {
 
     void delete(String key);
 
-    File getFile(String key,int i);
+    File getFile(String key, int i);
 
     void clear();
 }

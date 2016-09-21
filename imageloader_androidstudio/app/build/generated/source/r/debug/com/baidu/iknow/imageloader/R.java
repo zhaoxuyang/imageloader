@@ -9,6 +9,14 @@ package com.baidu.iknow.imageloader;
 
 public final class R {
     public static final class attr {
+        /** <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int civ_adjustContentBounds=0x7f010008;
         /** <p>Must be a floating point value, such as "<code>1.2</code>".
 <p>This may also be a reference to a resource (in the form
 "<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
@@ -79,6 +87,26 @@ theme attribute (in the form
 "<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
 containing a value of this type.
          */
+        public static final int civ_maxHeight=0x7f010009;
+        /** <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
+        public static final int civ_maxWidth=0x7f01000a;
+        /** <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+         */
         public static final int civ_radius=0x7f010000;
     }
     public static final class drawable {
@@ -90,28 +118,33 @@ containing a value of this type.
         public static final int s=0x7f020005;
     }
     public static final class id {
-        public static final int center=0x7f060008;
-        public static final int centercrop=0x7f060007;
-        public static final int centerinside=0x7f060006;
+        public static final int center=0x7f060009;
+        public static final int centercrop=0x7f060008;
+        public static final int centerinside=0x7f060007;
         public static final int circle=0x7f060000;
-        public static final int circleDrawer=0x7f06000f;
+        public static final int circleDrawer=0x7f060012;
         public static final int custom=0x7f060001;
-        public static final int customDrawer=0x7f060010;
-        public static final int fitcenter=0x7f06000a;
-        public static final int fitend=0x7f06000b;
-        public static final int fitstart=0x7f060009;
-        public static final int fitxy=0x7f060005;
-        public static final int iv=0x7f060011;
-        public static final int list=0x7f060004;
-        public static final int matrixtopcrop=0x7f06000c;
+        public static final int customDrawer=0x7f060013;
+        public static final int fitcenter=0x7f06000b;
+        public static final int fitend=0x7f06000c;
+        public static final int fitstart=0x7f06000a;
+        public static final int fitxy=0x7f060006;
+        public static final int iv=0x7f060015;
+        public static final int list=0x7f060005;
+        public static final int matrixfitheight=0x7f06000f;
+        public static final int matrixfitwidth=0x7f06000e;
+        public static final int matrixtopcrop=0x7f06000d;
+        public static final int nextpage=0x7f060014;
         public static final int normal=0x7f060002;
-        public static final int normalDrawer=0x7f06000d;
+        public static final int normalDrawer=0x7f060010;
         public static final int round_rect=0x7f060003;
-        public static final int roundrectDrawer=0x7f06000e;
+        public static final int roundrectDrawer=0x7f060011;
+        public static final int single=0x7f060004;
     }
     public static final class layout {
-        public static final int activity_list_item=0x7f030000;
-        public static final int view_item=0x7f030001;
+        public static final int activity_list2=0x7f030000;
+        public static final int activity_list_item=0x7f030001;
+        public static final int view_item=0x7f030002;
     }
     public static final class string {
         public static final int app_name=0x7f050000;
@@ -137,6 +170,7 @@ containing a value of this type.
            <colgroup align="left" />
            <colgroup align="left" />
            <tr><th>Attribute</th><th>Description</th></tr>
+           <tr><td><code>{@link #CustomImageView_civ_adjustContentBounds com.baidu.iknow.imageloader:civ_adjustContentBounds}</code></td><td></td></tr>
            <tr><td><code>{@link #CustomImageView_civ_alpha com.baidu.iknow.imageloader:civ_alpha}</code></td><td></td></tr>
            <tr><td><code>{@link #CustomImageView_civ_borderColor com.baidu.iknow.imageloader:civ_borderColor}</code></td><td></td></tr>
            <tr><td><code>{@link #CustomImageView_civ_borderSurroundContent com.baidu.iknow.imageloader:civ_borderSurroundContent}</code></td><td></td></tr>
@@ -144,8 +178,11 @@ containing a value of this type.
            <tr><td><code>{@link #CustomImageView_civ_drawerType com.baidu.iknow.imageloader:civ_drawerType}</code></td><td></td></tr>
            <tr><td><code>{@link #CustomImageView_civ_hasBorder com.baidu.iknow.imageloader:civ_hasBorder}</code></td><td></td></tr>
            <tr><td><code>{@link #CustomImageView_civ_isNight com.baidu.iknow.imageloader:civ_isNight}</code></td><td></td></tr>
+           <tr><td><code>{@link #CustomImageView_civ_maxHeight com.baidu.iknow.imageloader:civ_maxHeight}</code></td><td></td></tr>
+           <tr><td><code>{@link #CustomImageView_civ_maxWidth com.baidu.iknow.imageloader:civ_maxWidth}</code></td><td></td></tr>
            <tr><td><code>{@link #CustomImageView_civ_radius com.baidu.iknow.imageloader:civ_radius}</code></td><td></td></tr>
            </table>
+           @see #CustomImageView_civ_adjustContentBounds
            @see #CustomImageView_civ_alpha
            @see #CustomImageView_civ_borderColor
            @see #CustomImageView_civ_borderSurroundContent
@@ -153,12 +190,29 @@ containing a value of this type.
            @see #CustomImageView_civ_drawerType
            @see #CustomImageView_civ_hasBorder
            @see #CustomImageView_civ_isNight
+           @see #CustomImageView_civ_maxHeight
+           @see #CustomImageView_civ_maxWidth
            @see #CustomImageView_civ_radius
          */
         public static final int[] CustomImageView = {
             0x7f010000, 0x7f010001, 0x7f010002, 0x7f010003,
-            0x7f010004, 0x7f010005, 0x7f010006, 0x7f010007
+            0x7f010004, 0x7f010005, 0x7f010006, 0x7f010007,
+            0x7f010008, 0x7f010009, 0x7f01000a
         };
+        /**
+          <p>This symbol is the offset where the {@link com.baidu.iknow.imageloader.R.attr#civ_adjustContentBounds}
+          attribute's value can be found in the {@link #CustomImageView} array.
+
+
+          <p>Must be a boolean value, either "<code>true</code>" or "<code>false</code>".
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name com.baidu.iknow.imageloader:civ_adjustContentBounds
+        */
+        public static final int CustomImageView_civ_adjustContentBounds = 8;
         /**
           <p>This symbol is the offset where the {@link com.baidu.iknow.imageloader.R.attr#civ_alpha}
           attribute's value can be found in the {@link #CustomImageView} array.
@@ -262,6 +316,38 @@ containing a value of this type.
           @attr name com.baidu.iknow.imageloader:civ_isNight
         */
         public static final int CustomImageView_civ_isNight = 5;
+        /**
+          <p>This symbol is the offset where the {@link com.baidu.iknow.imageloader.R.attr#civ_maxHeight}
+          attribute's value can be found in the {@link #CustomImageView} array.
+
+
+          <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name com.baidu.iknow.imageloader:civ_maxHeight
+        */
+        public static final int CustomImageView_civ_maxHeight = 9;
+        /**
+          <p>This symbol is the offset where the {@link com.baidu.iknow.imageloader.R.attr#civ_maxWidth}
+          attribute's value can be found in the {@link #CustomImageView} array.
+
+
+          <p>Must be a dimension value, which is a floating point number appended with a unit such as "<code>14.5sp</code>".
+Available units are: px (pixels), dp (density-independent pixels), sp (scaled pixels based on preferred font size),
+in (inches), mm (millimeters).
+<p>This may also be a reference to a resource (in the form
+"<code>@[<i>package</i>:]<i>type</i>:<i>name</i></code>") or
+theme attribute (in the form
+"<code>?[<i>package</i>:][<i>type</i>:]<i>name</i></code>")
+containing a value of this type.
+          @attr name com.baidu.iknow.imageloader:civ_maxWidth
+        */
+        public static final int CustomImageView_civ_maxWidth = 10;
         /**
           <p>This symbol is the offset where the {@link com.baidu.iknow.imageloader.R.attr#civ_radius}
           attribute's value can be found in the {@link #CustomImageView} array.

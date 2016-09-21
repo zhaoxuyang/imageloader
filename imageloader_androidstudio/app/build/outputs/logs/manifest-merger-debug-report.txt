@@ -1,8 +1,6 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:1:1-28:12
-	xmlns:android
-		ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:1:11-69
+ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:1:1-32:12
 	package
 		ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:2:5-42
 		INJECTED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml
@@ -15,6 +13,8 @@ ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app
 		ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:3:5-28
 		INJECTED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml
 		INJECTED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:1:11-69
 uses-sdk
 ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:6:5-8:41
 	android:targetSdkVersion
@@ -26,7 +26,7 @@ ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app
 		INJECTED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml
 		INJECTED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml
 application
-ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:10:5-23:19
+ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:10:5-27:19
 	android:label
 		ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:14:9-41
 	android:allowBackup
@@ -51,11 +51,15 @@ category#android.intent.category.LAUNCHER
 ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:20:17-76
 	android:name
 		ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:20:27-74
+activity#com.baidu.iknow.imageloader.TestActivty2
+ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:24:9-26:20
+	android:name
+		ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:25:13-68
 uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
-ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:25:5-80
+ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:29:5-80
 	android:name
-		ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:25:22-78
+		ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:29:22-78
 uses-permission#android.permission.INTERNET
-ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:26:5-66
+ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:30:5-66
 	android:name
-		ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:26:22-64
+		ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:30:22-64

@@ -11,6 +11,7 @@ import android.graphics.Paint.Style;
 import android.graphics.PointF;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.widget.ImageView.ScaleType;
 
@@ -204,7 +205,14 @@ public abstract class AbsDrawer {
                     }
                     mDrawMatrix.setScale(scale, scale);
                     mDrawMatrix.postTranslate(dx, 0);
-                    System.out.println("top_crop");
+                } else if(drawable.mMatrixScaleType == MatrixScaleType.FIT_WIDTH){
+                    float scale = (float)vwidth / (float)dwidth;
+                    mDrawMatrix.setScale(scale, scale);
+                    mDrawMatrix.postTranslate(0, 0);
+                } else if(drawable.mMatrixScaleType == MatrixScaleType.FIT_HEIGHT){
+                    float scale = (float)vheight / (float)dheight;
+                    mDrawMatrix.setScale(scale, scale);
+                    mDrawMatrix.postTranslate(0, 0);
                 } else {
                     mDrawMatrix.set(drawable.mCustomMatrix);
                 }

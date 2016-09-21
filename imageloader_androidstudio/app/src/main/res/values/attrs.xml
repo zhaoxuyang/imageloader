@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <declare-styleable name="CustomImageView">
 
         <!-- 圆角度数 -->
@@ -14,17 +15,21 @@
         <!-- 夜间模式相关 -->
         <attr name="civ_isNight" format="boolean" />
 
-
         <!-- alpha相关 -->
         <attr name="civ_alpha" format="float" />
 
         <!-- 图片绘制器的type -->
-        <attr name="civ_drawerType" format="enum" >
-            <enum name="normal" value="0"/>
-            <enum name="round_rect" value="1"/>
-            <enum name="circle" value="2"/>
-            <enum name="custom" value="3"/>
+        <attr name="civ_drawerType" format="enum">
+            <enum name="normal" value="0" />
+            <enum name="round_rect" value="1" />
+            <enum name="circle" value="2" />
+            <enum name="custom" value="3" />
         </attr>
+
+        <!-- adjustContentBounds -->
+        <attr name="civ_adjustContentBounds" format="boolean" />
+        <attr name="civ_maxHeight" format="dimension" />
+        <attr name="civ_maxWidth" format="dimension" />
     </declare-styleable>
 
 </resources>
