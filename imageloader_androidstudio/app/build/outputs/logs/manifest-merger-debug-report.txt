@@ -1,6 +1,8 @@
 -- Merging decision tree log ---
 manifest
 ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:1:1-28:12
+	xmlns:android
+		ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:1:11-69
 	package
 		ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:2:5-42
 		INJECTED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml
@@ -13,8 +15,6 @@ ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app
 		ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:3:5-28
 		INJECTED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml
 		INJECTED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml
-	xmlns:android
-		ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:1:11-69
 uses-sdk
 ADDED from /Users/zhaoxuyang/Documents/imageloader/imageloader_androidstudio/app/src/main/AndroidManifest.xml:6:5-8:41
 	android:targetSdkVersion

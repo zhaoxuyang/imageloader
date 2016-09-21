@@ -1,6 +1,8 @@
 package com.baidu.iknow.imageloader;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -9,11 +11,17 @@ import com.baidu.iknow.imageloader.drawer.DrawerFactory;
 import com.baidu.iknow.imageloader.widgets.CustomImageView;
 import com.baidu.iknow.imageloader.widgets.CustomImageView.CustomImageBuilder;
 import com.baidu.iknow.imageloader.widgets.CustomImageView.MatrixScaleType;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Path;
 import android.os.Bundle;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -27,7 +35,7 @@ public class TestActivity extends Activity {
     private ArrayList<ItemData> mdatas = new ArrayList<TestActivity.ItemData>();
 
     private ScaleType scaleType = ScaleType.FIT_XY;
-    
+
     private MatrixScaleType matrixScaleType = MatrixScaleType.MATRIX;
 
     private int drawerType = 0;
@@ -38,6 +46,7 @@ public class TestActivity extends Activity {
 
     private float density;
 
+    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +54,8 @@ public class TestActivity extends Activity {
         // try {
 
         setContentView(R.layout.activity_list_item);
+        addData("http://www.mathunion.org/fileadmin/IMU/Logo/IMU-logo-wt.png");
+        addData("http://www.lunapic.com/editor/premade/transparent.gif");
         addData("http://img.name2012.com/uploads/allimg/2015-06/30-023131_451.jpg");
         addData("http://www.baidu.com");
         addData("http://tb.himg.baidu.com/sys/portrait/item/6ebee68891e69c89e5a5bde5908de5ad9779799774");
@@ -103,7 +114,30 @@ public class TestActivity extends Activity {
         listView.setAdapter(adapter);
 
         density = getResources().getDisplayMetrics().density;
+        System.out.println("patch:" + getPackageResourcePath());
 
+        AssetManager asset = getResources().getAssets();
+        try {
+//            Method method = AssetManager.class.getDeclaredMethod("getAssignedPackageIdentifiers");
+//            method.setAccessible(true);
+//            SparseArray<String> packs = (SparseArray<String>) method.invoke(asset);
+//            int size = packs.size();
+//            for (int i = 0; i < size; i++) {
+//                System.out.println("inden:" + packs.get(i));
+//            }
+            
+            
+            Class clazz = Class.forName("android.webkit.WebViewFactory");
+            Method method = clazz.getDeclaredMethod("getWebViewPackageName");
+            method.setAccessible(true);
+            String packageName = (String) method.invoke(clazz);
+            System.out.println("packagename:"+packageName);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } 
+        
+        
     }
 
     private void addData(String url) {
@@ -112,9 +146,9 @@ public class TestActivity extends Activity {
         data.type = 1;
         mdatas.add(data);
     }
-    
-    private void addLocalData(){
-        
+
+    private void addLocalData() {
+
     }
 
     private void checkBuffer(Bitmap bm) {
@@ -164,6 +198,14 @@ public class TestActivity extends Activity {
                 scaleType = ScaleType.MATRIX;
                 matrixScaleType = MatrixScaleType.TOP_CROP;
                 break;
+            case R.id.matrixfitwidth:
+                scaleType = ScaleType.MATRIX;
+                matrixScaleType = MatrixScaleType.FIT_WIDTH;
+                break;
+            case R.id.matrixfitheight:
+                scaleType = ScaleType.MATRIX;
+                matrixScaleType = MatrixScaleType.FIT_HEIGHT;
+                break;
             case R.id.normalDrawer:
                 drawerType = DrawerFactory.NORMAL;
                 break;
@@ -175,6 +217,10 @@ public class TestActivity extends Activity {
                 break;
             case R.id.customDrawer:
                 drawerType = DrawerFactory.CUSTOM;
+                break;
+            case R.id.nextpage:
+                Intent intent = new Intent(this, TestActivty2.class);
+                startActivity(intent);
                 break;
 
         }
@@ -252,7 +298,8 @@ public class TestActivity extends Activity {
                     }
                     builder.setBlankRes(R.drawable.s).setBlankScaleType(scaleType).setBlankDrawerType(drawerType)
                             .setErrorRes(R.drawable.error).setErrorScaleType(scaleType).setErrorDrawerType(drawerType)
-                            .setDrawerType(drawerType).setScaleType(scaleType).setMatrixScaleType(matrixScaleType).build().url(data.key);
+                            .setDrawerType(drawerType).setScaleType(scaleType).setMatrixScaleType(matrixScaleType)
+                            .build().url(data.key);
                     break;
             }
 

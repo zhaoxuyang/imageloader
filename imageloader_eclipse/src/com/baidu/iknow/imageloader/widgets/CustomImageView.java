@@ -79,13 +79,13 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     private ImageLoadingListener mListener;
 
-    private boolean mAdjustViewBounds = false;
+    private boolean mAdjustViewBoundsCustom = false;
 
-    private int mMaxWidth = Integer.MAX_VALUE;
+    private int mMaxWidthCustom = Integer.MAX_VALUE;
 
-    private int mMaxHeight = Integer.MAX_VALUE;
+    private int mMaxHeightCustom = Integer.MAX_VALUE;
 
-    private boolean mAdjustViewBoundsCompat = false;
+    private boolean mAdjustContentBounds = false;
 
     public CustomImageView(Context context) {
         super(context);
@@ -99,6 +99,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
     public CustomImageView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(attrs);
+        
     }
 
     /**
@@ -126,6 +127,9 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
                 mBuilder.mIsNight = a.getBoolean(R.styleable.CustomImageView_civ_isNight, false);
                 mBuilder.mAlpha = a.getFloat(R.styleable.CustomImageView_civ_alpha, 1.0f);
                 mBuilder.mDrawerType = a.getInt(R.styleable.CustomImageView_civ_drawerType, DrawerFactory.NORMAL);
+                mAdjustContentBounds = a.getBoolean(R.styleable.CustomImageView_civ_adjustContentBounds, false);
+                mMaxWidthCustom = a.getDimensionPixelSize(R.styleable.CustomImageView_civ_maxWidth, Integer.MAX_VALUE);
+                mMaxHeightCustom = a.getDimensionPixelSize(R.styleable.CustomImageView_civ_maxHeight, Integer.MAX_VALUE);
                 a.recycle();
             } else {
                 mBuilder.mRadius = dipToPixel(getContext(), DEFAULT_RADIUS);
@@ -145,10 +149,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             }
 
             mBuilder.build();
-
             mIsVisible = getVisibility() == View.VISIBLE;
-            mAdjustViewBoundsCompat = getContext()
-                    .getApplicationInfo().targetSdkVersion <= Build.VERSION_CODES.JELLY_BEAN_MR1;
             getListView();
         } catch (Exception e) {
             e.printStackTrace();
@@ -185,7 +186,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             if (h <= 0) {
                 h = 1;
             }
-            if (mAdjustViewBounds) {
+            if (mAdjustViewBoundsCustom || mAdjustContentBounds) {
                 resizeWidth = (widthSpecMode != MeasureSpec.EXACTLY);
                 resizeHeight = (heightSpecMode != MeasureSpec.EXACTLY);
                 desiredAspect = (float) w / (float) h;
@@ -203,9 +204,9 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
         if (resizeWidth || resizeHeight) {
 
-            widthSize = resolveAdjustedSize(w + pleft + pright, mMaxWidth, widthMeasureSpec);
+            widthSize = resolveAdjustedSize(w + pleft + pright, mMaxWidthCustom, widthMeasureSpec);
 
-            heightSize = resolveAdjustedSize(h + ptop + pbottom, mMaxHeight, heightMeasureSpec);
+            heightSize = resolveAdjustedSize(h + ptop + pbottom, mMaxHeightCustom, heightMeasureSpec);
 
             if (desiredAspect != 0.0f) {
                 float actualAspect = (float) (widthSize - pleft - pright) / (heightSize - ptop - pbottom);
@@ -217,26 +218,47 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
                     if (resizeWidth) {
                         int newWidth = (int) (desiredAspect * (heightSize - ptop - pbottom)) + pleft + pright;
 
-                        if (!resizeHeight && !mAdjustViewBoundsCompat) {
-                            widthSize = resolveAdjustedSize(newWidth, mMaxWidth, widthMeasureSpec);
+                        
+                        if (mAdjustContentBounds) {
+                            if (newWidth >= widthSize) {
+                                widthSize = newWidth;
+                                done = true;
+                            }
+                            if (!resizeHeight) {
+                                widthSize = resolveAdjustedSize(newWidth, mMaxWidthCustom, widthMeasureSpec);
+                            }
+
+                        } else if (mAdjustViewBoundsCustom) {
+                            if (!resizeHeight) {
+                                widthSize = resolveAdjustedSize(newWidth, mMaxWidthCustom, widthMeasureSpec);
+                            }
+                            if (newWidth <= widthSize) {
+                                widthSize = newWidth;
+                                done = true;
+                            }
                         }
 
-                        if (newWidth <= widthSize) {
-                            widthSize = newWidth;
-                            done = true;
-                        }
                     }
 
                     if (!done && resizeHeight) {
                         int newHeight = (int) ((widthSize - pleft - pright) / desiredAspect) + ptop + pbottom;
-
-                        if (!resizeWidth && !mAdjustViewBoundsCompat) {
-                            heightSize = resolveAdjustedSize(newHeight, mMaxHeight, heightMeasureSpec);
+                        
+                        if (mAdjustContentBounds) {
+                            if (newHeight >= heightSize) {
+                                heightSize = newHeight;
+                            }
+                            if (!resizeWidth) {
+                                heightSize = resolveAdjustedSize(newHeight, mMaxHeightCustom, heightMeasureSpec);
+                            }
+                        } else if (mAdjustViewBoundsCustom) {
+                            if (!resizeWidth) {
+                                heightSize = resolveAdjustedSize(newHeight, mMaxHeightCustom, heightMeasureSpec);
+                            }
+                            if (newHeight <= heightSize) {
+                                heightSize = newHeight;
+                            }
                         }
 
-                        if (newHeight <= heightSize) {
-                            heightSize = newHeight;
-                        }
                     }
                 }
             }
@@ -247,6 +269,8 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
             w = Math.max(w, getSuggestedMinimumWidth());
             h = Math.max(h, getSuggestedMinimumHeight());
 
+            w = Math.min(w, mMaxWidthCustom);
+            h = Math.min(h, mMaxHeightCustom);
             widthSize = resolveSizeAndState(w, widthMeasureSpec, 0);
             heightSize = resolveSizeAndState(h, heightMeasureSpec, 0);
         }
@@ -277,6 +301,8 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         mHasFrame = true;
         return super.setFrame(l, t, r, b);
     }
+    
+    
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -323,28 +349,30 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     @Override
     public void setMaxWidth(int maxWidth) {
-        super.setMaxWidth(maxWidth);
-        mMaxWidth = maxWidth;
+        mMaxWidthCustom = maxWidth;
     }
 
     public int getMaxWidth() {
-        return mMaxWidth;
+        return mMaxWidthCustom;
     }
 
     @Override
     public void setMaxHeight(int maxHeight) {
-        super.setMaxHeight(maxHeight);
-        mMaxHeight = maxHeight;
+        mMaxHeightCustom = maxHeight;
     }
 
     public int getMaxHeight() {
-        return mMaxHeight;
+        return mMaxHeightCustom;
     }
 
     @Override
     public void setAdjustViewBounds(boolean adjustViewBounds) {
         super.setAdjustViewBounds(adjustViewBounds);
-        mAdjustViewBounds = adjustViewBounds;
+        mAdjustViewBoundsCustom = adjustViewBounds;
+    }
+    
+    public void setAdjustContentBounds(boolean adjustContentBounds){
+        mAdjustContentBounds = adjustContentBounds;
     }
 
     /**
@@ -519,7 +547,7 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
         int[] res = getKeySize();
         mIsLoad = true;
-        ImageLoader.getInstance().loadImage(mUrl, res[0], res[1], this, isFastScroll(),true);
+        ImageLoader.getInstance().loadImage(mUrl, res[0], res[1], this, isFastScroll(), true);
         invalidate();
     }
 
@@ -775,9 +803,9 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
 
     public static class CustomImageBuilder {
 
-        public static int BLANK_DEFAULT =  R.drawable.ic_default_picture;
+        public static int BLANK_DEFAULT = R.drawable.ic_default_picture;
 
-        public static int ERROR_DEFAULT =  R.drawable.ic_default_picture;
+        public static int ERROR_DEFAULT = R.drawable.ic_default_picture;
 
         private int mDrawerType = DrawerFactory.NORMAL;
 
@@ -1046,7 +1074,15 @@ public class CustomImageView extends ImageView implements ImageLoadingListener {
         MATRIX(0), /**
                     * 头部要完整显示
                     */
-        TOP_CROP(1);
+        TOP_CROP(1), /**
+                      * 以宽度填满控件为准，高度相应的缩放
+                      */
+        FIT_WIDTH(2),
+
+        /**
+         * 以高度填满控件为准，宽度相应的缩放
+         */
+        FIT_HEIGHT(3);
 
         MatrixScaleType(int ni) {
             nativeInt = ni;
